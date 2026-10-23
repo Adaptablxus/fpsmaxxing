@@ -10,7 +10,8 @@ vanilla renderer and Sodium get the smooth visible-radius governor; VulkanMod
 uses a real-render-distance fallback. See
 [Compatibility](#compatibility-with-optimization-mods-and-resource-packs).
 
-Latest release: <https://github.com/Adaptablxus/fpsmaxxing/releases>
+Latest release: <https://github.com/Adaptablxus/fpsmaxxing/releases>  
+Modrinth: <https://modrinth.com/mod/fpsmaxx>
 
 > **Read this first — the honest part**
 >

@@ -38,3 +38,10 @@ hs_err_*.log
 replay_*.log
 *.hprof
 *.jfr
+
+# modrinth api scratch
+
+project-data.json
+project-response.json
+version-data.json
+version-response.json

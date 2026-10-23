@@ -1,7 +1,8 @@
 # Releasing a new version
 
 Every version is committed, tagged, and pushed. The GitHub Actions **Release**
-workflow builds the tagged source and publishes the jar automatically.
+workflow builds the tagged source and publishes the jar automatically. The same
+jar is uploaded to Modrinth.
 
 1. Bump `version` in `gradle.properties`.
 2. Update the versioned jar names in `README.md` and the compatibility notes.
@@ -30,6 +31,24 @@ workflow builds the tagged source and publishes the jar automatically.
 
 The `Release` workflow runs for tags matching `v*`. It builds with Java 25 and
 uploads `FPSMaxx-<version>-mc26.2.jar` to the GitHub release.
+
+## Modrinth
+
+Project: <https://modrinth.com/mod/fpsmaxx>  
+Project ID: `kA3JYFQu`
+
+Use `MODRINTH.md` as the project body and `modrinth-icon.png` as the icon. For
+each version, upload the same `FPSMaxx-<version>-mc26.2.jar` with:
+
+- Game version: `26.2`
+- Loader: `fabric`
+- Environment: `client_only`
+- Version type: `release`
+- Required dependency: Fabric API (`P7dR8mSH`)
+- Optional dependency: Sodium (`AANobbMI`)
+
+The project is submitted for Modrinth review after the first version. Do not
+commit the Modrinth token or any API response scratch files.
 
 ## Notes
 
