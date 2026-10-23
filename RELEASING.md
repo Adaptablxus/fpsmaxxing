@@ -56,8 +56,8 @@ commit the Modrinth token or any API response scratch files.
 
 ## Archived versions
 
-- `1.1.0` is archived at `dist/versions/FPSMaxx-1.1.0-mc26.2.jar` and published on Modrinth.
-- `1.0.0` was deleted before this repository existed; no local copy remains.
+- `1.1.0` is archived at `dist/versions/FPSMaxx-1.1.0-mc26.2.jar`. It is published on Modrinth and as a GitHub release. Its tag points to the `archive/1.1.0` branch because the original source snapshot was not preserved.
+- `1.0.0` was deleted before this repository existed; no local copy remains. Do not fabricate a 1.0.0 build.
 
 ## Notes
 
