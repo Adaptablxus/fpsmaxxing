@@ -10,6 +10,8 @@ vanilla renderer and Sodium get the smooth visible-radius governor; VulkanMod
 uses a real-render-distance fallback. See
 [Compatibility](#compatibility-with-optimization-mods-and-resource-packs).
 
+Latest release: <https://github.com/Adaptablxus/fpsmaxxing/releases>
+
 > **Read this first — the honest part**
 >
 > No mod can render 64 chunks at 65+ FPS on every device. That is a hardware
