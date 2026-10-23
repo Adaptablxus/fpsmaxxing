@@ -41,8 +41,8 @@ Modrinth: <https://modrinth.com/mod/fpsmaxx>
 >
 > On a strong gaming PC you will sit at 64 chunks. On integrated graphics or a
 > phone it will settle at a lower visible distance and stay playable. If a device
-> cannot hit 65 FPS at the minimum distance (8 chunks by default), nothing can
-> fix that.
+> cannot hit 60-65 FPS at the minimum distance (4-8 chunks), nothing can fix
+> that.
 
 ## Requirements
 
