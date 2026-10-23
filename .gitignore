@@ -45,3 +45,7 @@ project-data.json
 project-response.json
 version-data.json
 version-response.json
+
+# modrinth version scratch
+version-*.json
+version-*-response.json

@@ -39,3 +39,14 @@ jobs:
             "FPSMaxx-${VERSION}-mc26.2.jar" \
             --title "FPSMaxx ${VERSION}" \
             --notes "FPSMaxx ${VERSION}"
+
+      - name: Publish to Modrinth
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          VERSION: ${{ env.VERSION }}
+        run: |
+          if [ -z "${MODRINTH_TOKEN:-}" ]; then
+            echo "MODRINTH_TOKEN is not configured; skipping Modrinth upload."
+            exit 0
+          fi
+          bash scripts/publish-modrinth.sh

@@ -29,16 +29,20 @@ jar is uploaded to Modrinth.
    git push origin main --tags
    ```
 
-The `Release` workflow runs for tags matching `v*`. It builds with Java 25 and
-uploads `FPSMaxx-<version>-mc26.2.jar` to the GitHub release.
+The `Release` workflow runs for tags matching `v*`. It builds with Java 25,
+uploads `FPSMaxx-<version>-mc26.2.jar` to the GitHub release, and then publishes
+the same jar to Modrinth when the `MODRINTH_TOKEN` Actions secret is configured.
+The upload script is `scripts/publish-modrinth.sh`; it skips cleanly if the
+secret is absent.
 
 ## Modrinth
 
 Project: <https://modrinth.com/mod/fpsmaxx>  
 Project ID: `kA3JYFQu`
 
-Use `MODRINTH.md` as the project body and `modrinth-icon.png` as the icon. For
-each version, upload the same `FPSMaxx-<version>-mc26.2.jar` with:
+Use `MODRINTH.md` as the project body and `modrinth-icon.png` as the icon. The
+release workflow uploads the same `FPSMaxx-<version>-mc26.2.jar` automatically.
+If uploading manually, use:
 
 - Game version: `26.2`
 - Loader: `fabric`
@@ -49,6 +53,11 @@ each version, upload the same `FPSMaxx-<version>-mc26.2.jar` with:
 
 The project is submitted for Modrinth review after the first version. Do not
 commit the Modrinth token or any API response scratch files.
+
+## Archived versions
+
+- `1.1.0` is archived at `dist/versions/FPSMaxx-1.1.0-mc26.2.jar` and published on Modrinth.
+- `1.0.0` was deleted before this repository existed; no local copy remains.
 
 ## Notes
 
