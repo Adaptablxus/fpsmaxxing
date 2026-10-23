@@ -80,6 +80,13 @@ public final class FPSMaxxConfig {
 	/** Let the governor reduce the particle budget when FPS falls below target. */
 	public boolean adaptiveParticles = true;
 
+	/**
+	 * Maximum chunk-section mesh rebuilds scheduled in one frame. 0 = vanilla
+	 * (unlimited). A budget smooths the frame-time spikes caused by rebuilding
+	 * many sections at once; skipped sections are re-queued for the next frame.
+	 */
+	public int sectionUpdateBudget = 0;
+
 	public static FPSMaxxConfig get() {
 		if (instance == null) {
 			load();
@@ -132,6 +139,28 @@ public final class FPSMaxxConfig {
 		particleCullDistance = FPSMaxxConstants.LOW_END_PARTICLE_CULL_DISTANCE;
 		maxParticles = FPSMaxxConstants.LOW_END_MAX_PARTICLES;
 		adaptiveParticles = true;
+		sectionUpdateBudget = FPSMaxxConstants.LOW_END_SECTION_UPDATE_BUDGET;
+	}
+
+	/** Mod-side defaults for an extremely weak device. */
+	public void applyPotatoDefaults() {
+		lowEndMode = true;
+		targetFps = FPSMaxxConstants.POTATO_TARGET_FPS;
+		adaptiveEnabled = true;
+		initialVisibleDistance = FPSMaxxConstants.POTATO_INITIAL_VISIBLE_DISTANCE;
+		minVisibleDistance = FPSMaxxConstants.POTATO_MIN_VISIBLE_DISTANCE;
+		simulationDistance = FPSMaxxConstants.POTATO_SIMULATION_DISTANCE;
+		forceSimulationDistance = true;
+		adaptiveMode = "auto";
+		sodiumIntegration = true;
+		sodiumConfigOverlay = true;
+		matchFogToVisibleDistance = true;
+		entityCullDistance = FPSMaxxConstants.POTATO_ENTITY_CULL_DISTANCE;
+		blockEntityCullDistance = FPSMaxxConstants.POTATO_BLOCK_ENTITY_CULL_DISTANCE;
+		particleCullDistance = FPSMaxxConstants.POTATO_PARTICLE_CULL_DISTANCE;
+		maxParticles = FPSMaxxConstants.POTATO_MAX_PARTICLES;
+		adaptiveParticles = true;
+		sectionUpdateBudget = FPSMaxxConstants.POTATO_SECTION_UPDATE_BUDGET;
 	}
 
 	/** Mod-side defaults for a normal PC. Vanilla graphics are left untouched. */
@@ -152,6 +181,7 @@ public final class FPSMaxxConfig {
 		particleCullDistance = FPSMaxxConstants.BALANCED_PARTICLE_CULL_DISTANCE;
 		maxParticles = FPSMaxxConstants.BALANCED_MAX_PARTICLES;
 		adaptiveParticles = true;
+		sectionUpdateBudget = FPSMaxxConstants.BALANCED_SECTION_UPDATE_BUDGET;
 	}
 
 	public void sanitize() {
@@ -175,6 +205,7 @@ public final class FPSMaxxConfig {
 		blockEntityCullDistance = clamp(blockEntityCullDistance, 0, 512);
 		particleCullDistance = clamp(particleCullDistance, 0, 512);
 		maxParticles = maxParticles == 0 ? 0 : clamp(maxParticles, 100, 20000);
+		sectionUpdateBudget = clamp(sectionUpdateBudget, 0, 512);
 	}
 
 	public synchronized void save() {

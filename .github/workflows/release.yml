@@ -45,11 +45,16 @@ jobs:
           ### How it optimizes
 
           - **Low-end preset** - `/fpsmaxx lowend` applies Fast graphics, clouds
-            off, minimal particles, render 16, simulation 8 and a 60 FPS target.
+            off, cloud distance 2, minimal particles, render 16, simulation 8 and
+            a 60 FPS target.
+          - **Potato preset** - `/fpsmaxx potato` goes to render 8, simulation 5,
+            tiny cull distances and a 24-section update budget.
           - **Adaptive chunk-section culling** - chunks stay loaded, but only the
             affordable visible radius is submitted to the renderer.
-          - **Particle culling and budgeting** - rejects distant particles and
-            shrinks the live cap when FPS falls.
+          - **Chunk-update budgeting** - caps mesh rebuilds per frame and re-queues
+            the rest, smoothing stutter.
+          - **Particle culling and budgeting** - rejects and removes distant
+            particles, and shrinks the live cap when FPS falls.
           - **Sodium integration** - caps Sodium's terrain search distance and fog
             to the same radius without unloading chunks.
           - **Entity and block-entity culling** - skips distant entities before
@@ -59,7 +64,8 @@ jobs:
           - **Chunk retention** - visible mode avoids repeated load/unload stutter.
 
           It is a rendering optimization mod, not a mob-AI or server optimizer.
-          Simulation distance 32 is CPU-heavy; the low-end preset lowers it to 8.
+          Simulation distance 32 is CPU-heavy; low-end lowers it to 8 and potato
+          lowers it to 5.
 
           **Full documentation:** https://github.com/Adaptablxus/fpsmaxxing
           **Modrinth:** https://modrinth.com/mod/fpsmaxx

@@ -149,6 +149,23 @@ public final class FPSMaxxCommands {
 					).withStyle(ChatFormatting.GREEN));
 					return 1;
 				}))
+				.then(ClientCommands.literal("potato").executes(ctx -> {
+					ctx.getSource().sendFeedback(Component.literal(
+						FPSMaxxPresets.applyPotato(ctx.getSource().getClient())
+					).withStyle(ChatFormatting.GREEN));
+					return 1;
+				}))
+				.then(ClientCommands.literal("sectionbudget")
+					.then(ClientCommands.argument("sections", IntegerArgumentType.integer(0, 512)).executes(ctx -> {
+						FPSMaxxConfig config = FPSMaxxConfig.get();
+						config.sectionUpdateBudget = IntegerArgumentType.getInteger(ctx, "sections");
+						config.save();
+						ctx.getSource().sendFeedback(Component.literal(
+							"FPSMaxx section update budget set to " + config.sectionUpdateBudget
+								+ " per frame (0 = vanilla/unlimited)"
+						).withStyle(ChatFormatting.GREEN));
+						return 1;
+					})))
 				.then(ClientCommands.literal("balanced").executes(ctx -> {
 					ctx.getSource().sendFeedback(Component.literal(
 						FPSMaxxPresets.applyBalanced(ctx.getSource().getClient())
@@ -202,6 +219,10 @@ public final class FPSMaxxCommands {
 				+ (config.adaptiveParticles
 					? " (" + Math.round(FPSMaxxGovernor.particleScale() * 100.0F) + "%)"
 					: "")
+				+ " | section budget " + config.sectionUpdateBudget
+				+ (config.sectionUpdateBudget > 0
+					? " (now " + FPSMaxxGovernor.sectionUpdateBudget() + ")"
+					: " (vanilla)")
 				+ " | sodium " + sodium
 		).withStyle(ChatFormatting.GRAY));
 	}

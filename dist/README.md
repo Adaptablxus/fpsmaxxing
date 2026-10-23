@@ -4,14 +4,18 @@ FPSMaxx is a **client-side Fabric optimization mod for Minecraft 26.2**, built
 for **smooth gameplay on low-end PCs** as well as high-end machines. It raises
 the render-distance slider from 32 to **64 chunks**, adds an adaptive
 visibility governor, and cuts the work that usually causes stutter: distant
-entities, block entities, particles, unnecessary chunk sections and oversized
-graphics settings. Install it on the client, not on the server.
+entities, block entities, particles, unnecessary chunk sections, oversized
+graphics settings and bursty chunk-mesh rebuilds. Install it on the client, not
+on the server.
 
 On a weak PC, run **`/fpsmaxx lowend`** once. It applies a complete low-end
 profile: Fast graphics, clouds off, fewer particles, no entity shadows or
 smooth lighting, 16-chunk render distance, 8-chunk simulation distance, a
-60 FPS target and tighter cull distances. New installs on detected low-end
-hardware start with the mod-side low-end defaults automatically.
+60 FPS target, tighter cull distances and a chunk-update budget. New installs
+on detected low-end hardware start with the mod-side low-end defaults
+automatically. If that is still not enough, **`/fpsmaxx potato`** goes further:
+render 8, simulation 5, tiny particle and entity distances, and a 24-section
+update budget.
 
 FPSMaxx also detects Sodium, Iris, VulkanMod and common optimization mods. The
 vanilla renderer and Sodium get the smooth visible-radius governor; VulkanMod
@@ -55,7 +59,7 @@ Modrinth: <https://modrinth.com/mod/fpsmaxx>
 | RAM | **4 GB+ allocated** for 64 chunks (6 GB recommended) |
 | CPU | 32 simulation distance is CPU-heavy; use `/fpsmaxx lowend` on weak PCs |
 | Sodium (optional) | **0.9.2+ for 26.2** (recommended) |
-| Mod | `FPSMaxx-1.2.0-mc26.2.jar` |
+| Mod | `FPSMaxx-1.3.0-mc26.2.jar` |
 
 ## Low-end PC quick start
 
@@ -67,15 +71,26 @@ After installing, launch the game, join a world and run:
 
 This applies the full low-end profile immediately:
 
-- Fast graphics preset, clouds off, particles minimal, weather radius 5
+- Fast graphics preset, clouds off, cloud distance 2, particles minimal
+- Weather radius 3, no vignette, improved transparency off, chunk fade 0
 - Entity shadows and smooth lighting off, biome blend 0
+- Mipmaps 0 and minimum anisotropic filtering
 - Render distance 16, simulation distance 8, target 60 FPS
 - Entity culling 48 blocks, block-entity culling 32 blocks
 - Particle culling 24 blocks, particle cap 1200
 - Entity distance scaling 0.5 and a 60 FPS framerate cap
+- Chunk-update budget 64 sections per frame (32 when FPS is low)
 
-It does not delete worlds or resource packs. If the result is still not smooth,
-lower the two biggest costs:
+If the result is still not smooth, try the potato preset:
+
+```text
+/fpsmaxx potato
+```
+
+It sets render 8, simulation 5, target 60, entity culling 24, block-entity
+culling 16, particle culling 8, particle cap 400 and a 24-section update
+budget. It also applies the same Fast graphics reductions as `/fpsmaxx lowend`.
+If you only need a little more, use the individual commands instead:
 
 ```text
 /fpsmaxx render 8
@@ -84,19 +99,19 @@ lower the two biggest costs:
 ```
 
 `/fpsmaxx balanced` restores the normal mod-side defaults (target 65, 32
-simulation, wider culls). It does **not** restore the vanilla graphics or
-framerate options that `/fpsmaxx lowend` changed; set those back in Video
-Settings if you want them. New installs on hardware detected as low-end (4 or fewer CPU cores, or
-2 GB or less of allocated heap) start with the mod-side low-end defaults
-automatically, but the command is what applies the vanilla graphics reductions.
-You can force the first-run choice with `-Dfpsmaxx.forceLowEnd=true` or
-`-Dfpsmaxx.forceBalanced=true`.
+simulation, wider culls, no section budget). It does **not** restore the vanilla
+graphics or framerate options that `/fpsmaxx lowend` or `/fpsmaxx potato`
+changed; set those back in Video Settings if you want them. New installs on
+hardware detected as low-end (4 or fewer CPU cores, or 2 GB or less of allocated
+heap) start with the mod-side low-end defaults automatically, but the command is
+what applies the vanilla graphics reductions. You can force the first-run choice
+with `-Dfpsmaxx.forceLowEnd=true` or `-Dfpsmaxx.forceBalanced=true`.
 
 ## Install — PC (official launcher / Prism / MultiMC)
 
 1. Install Fabric Loader 0.19.3+ for Minecraft 26.2.
 2. Put these two files in the instance's `mods` folder (both are in `dist/mods/`):
-   - `FPSMaxx-1.2.0-mc26.2.jar`
+   - `FPSMaxx-1.3.0-mc26.2.jar`
    - `fabric-api-0.161.0+26.2.jar`
 3. If you use **Sodium**, install **Sodium 0.9.2+ for 26.2** as well. FPSMaxx
    detects it automatically, applies the same adaptive radius to Sodium's
@@ -120,7 +135,7 @@ You can force the first-run choice with `-Dfpsmaxx.forceLowEnd=true` or
    Java 8/17/21. If the launcher does not offer Java 25 yet, the game itself
    cannot run 26.2 on that device — this is not a mod issue.
 2. Install **Fabric Loader 0.19.3+** for **26.2** inside the launcher.
-3. Copy `FPSMaxx-1.2.0-mc26.2.jar` **and** `fabric-api-0.161.0+26.2.jar` into
+3. Copy `FPSMaxx-1.3.0-mc26.2.jar` **and** `fabric-api-0.161.0+26.2.jar` into
    `.minecraft/mods`. If your launcher/GPU supports Sodium 0.9.2+ for 26.2,
    install it too; FPSMaxx will detect it.
 4. Allocate as much RAM as the device allows. 64 chunks is extremely heavy;
@@ -148,7 +163,8 @@ Edit `config/fpsmaxx.json` (created after the first launch) or use commands:
   "blockEntityCullDistance": 32,
   "particleCullDistance": 24,
   "maxParticles": 1200,
-  "adaptiveParticles": true
+  "adaptiveParticles": true,
+  "sectionUpdateBudget": 64
 }
 ```
 
@@ -156,25 +172,29 @@ Then set the render-distance slider to **16 or lower**. The slider can go to 64,
 but on a phone that mostly wastes RAM and battery. The governor will keep the
 frame rate playable either way. The normal-PC default is `simulationDistance:
 32`; 6-12 is the sensible phone/low-end range because 32 chunks of mob AI and
-block ticking will eat the CPU headroom the renderer needs.
+block ticking will eat the CPU headroom the renderer needs. On a phone, try
+`/fpsmaxx potato` first; it uses render 8, simulation 5 and a 24-section update
+budget.
 
 ## Commands
 
 | Command | What it does |
 |---|---|
-| `/fpsmaxx` or `/fpsmaxx status` | Show adaptive state, visible/simulation distance, culls, particles, FPS |
+| `/fpsmaxx` or `/fpsmaxx status` | Show adaptive state, visible/simulation distance, culls, particles, section budget, FPS |
 | `/fpsmaxx lowend` | Apply the complete low-end PC profile |
+| `/fpsmaxx potato` | Apply the extreme low-end profile (render 8, simulation 5) |
 | `/fpsmaxx balanced` | Restore normal mod-side defaults (vanilla graphics unchanged) |
 | `/fpsmaxx adaptive <true/false>` | Turn the governor on/off |
-| `/fpsmaxx target <fps>` | Target FPS (30–1000; default **65**, **60** in low-end mode) |
+| `/fpsmaxx target <fps>` | Target FPS (30–1000; default **65**, **60** in low-end/potato mode) |
 | `/fpsmaxx render <chunks>` | Set the requested render distance (2–64) |
 | `/fpsmaxx mode <auto/visible/render>` | Choose the adaptive strategy (default **auto**) |
-| `/fpsmaxx simulation <chunks>` | Pin simulation distance (5–32; default **32**, **8** low-end) |
-| `/fpsmaxx min <chunks>` | Lowest visible distance (default **8**, **4** low-end) |
-| `/fpsmaxx entity <blocks>` | Entity cull distance, 0 = off (default **96**, **48** low-end) |
-| `/fpsmaxx blockentity <blocks>` | Block-entity cull distance, 0 = off (default **96**, **32** low-end) |
-| `/fpsmaxx particles <blocks>` | Particle cull distance, 0 = off (default **64**, **24** low-end) |
-| `/fpsmaxx maxparticles <count>` | Particle cap, 0 = vanilla limits only (default **4000**, **1200** low-end) |
+| `/fpsmaxx simulation <chunks>` | Pin simulation distance (5–32; default **32**, **8** low-end, **5** potato) |
+| `/fpsmaxx min <chunks>` | Lowest visible distance (default **8**, **4** low-end, **2** potato) |
+| `/fpsmaxx entity <blocks>` | Entity cull distance, 0 = off (default **96**, **48** low-end, **24** potato) |
+| `/fpsmaxx blockentity <blocks>` | Block-entity cull distance, 0 = off (default **96**, **32** low-end, **16** potato) |
+| `/fpsmaxx particles <blocks>` | Particle cull distance, 0 = off (default **64**, **24** low-end, **8** potato) |
+| `/fpsmaxx maxparticles <count>` | Particle cap, 0 = vanilla limits only (default **4000**, **1200** low-end, **400** potato) |
+| `/fpsmaxx sectionbudget <sections>` | Max chunk-section rebuilds per frame, 0 = vanilla (low-end **64**, potato **24**) |
 | `/fpsmaxx reload` | Reload `config/fpsmaxx.json` and re-apply simulation distance |
 
 `/fpsmaxx simulation <chunks>` also sets `forceSimulationDistance` to `true`, so
@@ -211,15 +231,26 @@ currently afford.
   configured cull distance are skipped before extraction/submission. This matters
   at 64 chunks because the server keeps far more entities loaded.
 - **Particle culling and budgeting** — particles beyond the cull distance are
-  rejected before they enter the tick/render queues. A live-particle cap stops
-  rain, fires, explosions and large farms from flooding the client. When FPS
-  drops, the governor reduces the particle budget down to 50%; when FPS recovers,
-  it grows back.
-- **Low-end preset** — one command applies Fast graphics, clouds off, minimal
-  particles, no entity shadows or smooth lighting, no biome blend, a smaller
-  weather radius, entity distance scaling 0.5, render 16, simulation 8 and a
-  60 FPS cap. These are the settings that usually make the biggest difference
-  on integrated graphics and old laptops.
+  rejected before they enter the tick/render queues, and particles that drift
+  outside the radius are removed instead of ticking forever. A live-particle cap
+  stops rain, fires, explosions and large farms from flooding the client. When
+  FPS drops, the governor reduces the particle budget down to 50%; when FPS
+  recovers, it grows back.
+- **Chunk-update budgeting** — chunk mesh rebuilds are bursty. When a large
+  batch of sections becomes dirty, FPSMaxx schedules only the nearest budget
+  (64 in low-end mode, 24 in potato mode) and re-queues the rest for the next
+  frame. This smooths stutter without leaving chunks permanently unbuilt. The
+  budget applies to the vanilla chunk renderer; Sodium schedules its own chunk
+  builds.
+- **Low-end preset** — one command applies Fast graphics, clouds off, cloud
+  distance 2, minimal particles, weather radius 3, no vignette, no improved
+  transparency, zero chunk fade, no entity shadows or smooth lighting, no biome
+  blend, mipmaps 0, minimum anisotropic filtering, entity distance scaling 0.5,
+  render 16, simulation 8 and a 60 FPS cap. These are the settings that usually
+  make the biggest difference on integrated graphics and old laptops.
+- **Potato preset** — the same reductions plus render 8, simulation 5, entity
+  culling 24, block-entity culling 16, particle culling 8, particle cap 400 and
+  a 24-section update budget for phones and very old integrated GPUs.
 - **Fog matching** — fog is moved to the same radius as the visible terrain. This
   is a visual fix (it hides the edge); it is not itself a large FPS gain.
 - **Memory guard** — on small heaps the mod caps loaded chunks and simulation
@@ -231,10 +262,10 @@ currently afford.
 
 What it does **not** do: it does not speed up mob AI, block ticking, world
 generation or the server. Simulation distance 32 is expensive; the low-end
-preset lowers it to 8. Unlocking 64 chunks also increases load. The governor is
-the trade-off: it keeps the requested distance loaded and reduces what is
-drawn. If the FPS target still cannot be met, lower simulation distance and the
-minimum visible distance.
+preset lowers it to 8 and the potato preset to 5. Unlocking 64 chunks also
+increases load. The governor is the trade-off: it keeps the requested distance
+loaded and reduces what is drawn. If the FPS target still cannot be met, lower
+simulation distance and the minimum visible distance.
 
 ## How the governor works
 
@@ -246,18 +277,19 @@ minimum visible distance.
   the ring outside the governed radius.
 - Fog is moved to that same radius, so the world edge is never visible.
 - Entities, block entities and particles past their cull distances are not
-  submitted.
+  submitted, and far particles are removed from the tick list.
 - Simulation distance is pinned to `simulationDistance` when a world is entered:
-  **32 on a normal PC**, **8 in low-end mode** (or the memory-safe cap). It is
-  **not** part of the visible-radius governor because lowering it changes mob
-  AI and ticking; that is a deliberate manual trade-off.
+  **32 on a normal PC**, **8 in low-end mode**, **5 in potato mode** (or the
+  memory-safe cap). It is **not** part of the visible-radius governor because
+  lowering it changes mob AI and ticking; that is a deliberate manual trade-off.
 - Each second the mod reads the smoothed FPS. Below target it drops the visible
   radius quickly and reduces the particle budget; above target (with a
-  5-second cooldown) it grows both back.
+  5-second cooldown) it grows both back. A section budget also halves while the
+  frame rate is below target, so mesh rebuilds do not keep the GPU/CPU pinned.
 - The starting radius is `initialVisibleDistance` (**32** on a normal PC,
-  **8** in low-end mode), then it ramps up to your slider value when the FPS
-  headroom allows it. That is why the first few seconds after joining are
-  conservative.
+  **8** in low-end mode, **4** in potato mode), then it ramps up to your slider
+  value when the FPS headroom allows it. That is why the first few seconds after
+  joining are conservative.
 - The governor intentionally pauses while a menu is open and for a couple of
   seconds after every change, because chunk-mesh compilation itself causes a
   short FPS dip. Without that, the mod would shrink the world every time it
@@ -291,18 +323,40 @@ simulation 32 may settle lower; use `/fpsmaxx lowend` or
   the OpenGL backend is much slower on some systems.
 - Leave the governor on. `target 65` is the normal default; `/fpsmaxx lowend`
   sets a more realistic **60 FPS** target for weak hardware.
-- Simulation distance is **32** on a normal PC and **8** in low-end mode. If the
-  visible radius keeps dropping, lower it with `/fpsmaxx simulation 12` or `8`.
-- On a low-end PC, use `/fpsmaxx lowend` first, then tune
-  `/fpsmaxx render 8`, `/fpsmaxx simulation 6` and `/fpsmaxx min 2` only if
+- Simulation distance is **32** on a normal PC, **8** in low-end mode and **5**
+  in potato mode. It drives mob AI and block ticking, not rendering, but 32
+  chunks of simulation is still expensive. If the visible radius keeps dropping,
+  lower it with `/fpsmaxx simulation 12` or `8`.
+- On a low-end PC, use `/fpsmaxx lowend` first, then `/fpsmaxx potato`, then
+  tune `/fpsmaxx render 8`, `/fpsmaxx simulation 6` and `/fpsmaxx min 2` only if
   needed.
-  It drives mob AI and block ticking, not rendering, but 32 chunks of simulation
-  is still expensive.
+- If chunk loading causes stutter, lower `/fpsmaxx sectionbudget` (for example
+  to 32). A lower budget smooths frame time but makes newly loaded areas take
+  longer to appear. Set it to 0 to use vanilla's unlimited behavior.
 - Install **Sodium 0.9.2+ for 26.2** when possible; FPSMaxx has a tested
   integration for it. Leave `sodiumIntegration` enabled. If `/fpsmaxx status`
   reports no Sodium hook, use `/fpsmaxx mode render` instead.
 - If a resource pack or shader pack supplies custom fog, set
   `"matchFogToVisibleDistance": false` and `/fpsmaxx reload`.
+
+## If you need even more performance
+
+These are the remaining high-impact levers, in order:
+
+1. `/fpsmaxx potato` — render 8, simulation 5, tiny cull distances.
+2. Lower the **window resolution** or play in a smaller window. Fill rate is
+   usually the biggest GPU cost on integrated graphics, and no mod can beat a
+   lower pixel count.
+3. Disable shader packs. Iris shaders can cost more than the vanilla renderer
+   saves, especially at high shadow resolution.
+4. Use **Sodium 0.9.2+** and the **Vulkan** backend when your GPU supports it.
+5. `/fpsmaxx simulation 5` or `6` and `/fpsmaxx render 8` if CPU time is the
+   bottleneck. Simulation distance changes mob AI and ticking; render distance
+   changes what is loaded.
+6. `/fpsmaxx sectionbudget 32` if chunk loading still stutters. This trades
+   faster terrain appearance for smoother frame times.
+7. Close background applications, browsers and overlays. On a 2-4 GB machine
+   they compete for the same RAM and CPU as Minecraft.
 
 ## Compatibility with optimization mods and resource packs
 
@@ -370,8 +424,8 @@ entities it does not have.
 ./gradlew build
 ```
 
-The jar is produced at `build/libs/fpsmaxx-1.2.0.jar`; the ready-to-install copy
-is `dist/mods/FPSMaxx-1.2.0-mc26.2.jar`. Toolchain: Gradle 9.7.1,
+The jar is produced at `build/libs/fpsmaxx-1.3.0.jar`; the ready-to-install copy
+is `dist/mods/FPSMaxx-1.3.0-mc26.2.jar`. Toolchain: Gradle 9.7.1,
 Loom 1.18.4, Java 25, Minecraft 26.2 (unobfuscated, Mojang names).
 
 ## License

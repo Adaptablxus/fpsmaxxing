@@ -283,6 +283,29 @@ public final class FPSMaxxGovernor {
 	}
 
 	/**
+	 * Section mesh rebuilds are bursty: a single frame can otherwise schedule
+	 * hundreds of compiles and cause a visible stutter. When the FPS is already
+	 * below target, halve the budget so the frame rate recovers faster.
+	 */
+	public static int sectionUpdateBudget() {
+		FPSMaxxConfig config = FPSMaxxConfig.get();
+		int budget = config.sectionUpdateBudget;
+		if (budget <= 0) {
+			return 0;
+		}
+
+		Minecraft client = Minecraft.getInstance();
+		if (client.level == null || client.player == null || client.getFps() <= 0) {
+			return budget;
+		}
+
+		if (client.getFps() < effectiveTargetFps(client, config) - 10) {
+			return Math.max(1, budget / 2);
+		}
+		return budget;
+	}
+
+	/**
 	 * Fog must match the reduced visible radius or the world edge becomes visible.
 	 */
 	public static int fogDistanceChunks(int vanillaEffectiveDistance) {

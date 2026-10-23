@@ -30,6 +30,19 @@ public final class FPSMaxxConstants {
 	public static final int LOW_END_PARTICLE_CULL_DISTANCE = 24;
 	public static final int LOW_END_MAX_PARTICLES = 1200;
 	public static final int LOW_END_RENDER_DISTANCE = 16;
+	public static final int LOW_END_SECTION_UPDATE_BUDGET = 64;
+
+	/** Extreme low-end preset for phones, old laptops and integrated graphics. */
+	public static final int POTATO_TARGET_FPS = 60;
+	public static final int POTATO_INITIAL_VISIBLE_DISTANCE = 4;
+	public static final int POTATO_MIN_VISIBLE_DISTANCE = 2;
+	public static final int POTATO_SIMULATION_DISTANCE = 5;
+	public static final int POTATO_ENTITY_CULL_DISTANCE = 24;
+	public static final int POTATO_BLOCK_ENTITY_CULL_DISTANCE = 16;
+	public static final int POTATO_PARTICLE_CULL_DISTANCE = 8;
+	public static final int POTATO_MAX_PARTICLES = 400;
+	public static final int POTATO_RENDER_DISTANCE = 8;
+	public static final int POTATO_SECTION_UPDATE_BUDGET = 24;
 
 	/** Balanced preset values for normal PCs. */
 	public static final int BALANCED_TARGET_FPS = 65;
@@ -39,6 +52,7 @@ public final class FPSMaxxConstants {
 	public static final int BALANCED_BLOCK_ENTITY_CULL_DISTANCE = 96;
 	public static final int BALANCED_PARTICLE_CULL_DISTANCE = 64;
 	public static final int BALANCED_MAX_PARTICLES = 4000;
+	public static final int BALANCED_SECTION_UPDATE_BUDGET = 0;
 
 	/**
 	 * A conservative hardware check used only for first-run defaults. It does

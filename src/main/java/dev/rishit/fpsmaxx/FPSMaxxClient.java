@@ -59,14 +59,15 @@ public final class FPSMaxxClient implements ClientModInitializer {
 			FPSMaxxConfig.get().adaptiveEnabled
 		);
 		LOGGER.info(
-			"FPSMaxx low-end mode {}: target {} FPS, particle cull {} blocks, particle cap {} (adaptive {}), entity cull {} blocks, block-entity cull {} blocks",
+			"FPSMaxx low-end mode {}: target {} FPS, particle cull {} blocks, particle cap {} (adaptive {}), entity cull {} blocks, block-entity cull {} blocks, section budget {}",
 			FPSMaxxConfig.get().lowEndMode ? "ON" : "OFF",
 			FPSMaxxConfig.get().targetFps,
 			FPSMaxxConfig.get().particleCullDistance,
 			FPSMaxxConfig.get().maxParticles,
 			FPSMaxxConfig.get().adaptiveParticles,
 			FPSMaxxConfig.get().entityCullDistance,
-			FPSMaxxConfig.get().blockEntityCullDistance
+			FPSMaxxConfig.get().blockEntityCullDistance,
+			FPSMaxxConfig.get().sectionUpdateBudget
 		);
 		if (safeDistance < FPSMaxxConstants.MAX_RENDER_DISTANCE) {
 			LOGGER.warn(

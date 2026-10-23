@@ -4,6 +4,7 @@ import dev.rishit.fpsmaxx.FPSMaxxConfig;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,8 +40,11 @@ public abstract class BlockEntityRenderDispatcherMixin {
 			return;
 		}
 
-		Vec3 pos = Vec3.atCenterOf(blockEntity.getBlockPos());
-		if (pos.distanceToSqr(this.cameraPos) > (double) cullDistance * cullDistance) {
+		BlockPos pos = blockEntity.getBlockPos();
+		double dx = pos.getX() + 0.5D - this.cameraPos.x;
+		double dy = pos.getY() + 0.5D - this.cameraPos.y;
+		double dz = pos.getZ() + 0.5D - this.cameraPos.z;
+		if (dx * dx + dy * dy + dz * dz > (double) cullDistance * cullDistance) {
 			cir.setReturnValue(null);
 		}
 	}

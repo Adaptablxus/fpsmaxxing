@@ -2,23 +2,29 @@
 
 FPSMaxx is a **client-side Fabric optimization mod for Minecraft 26.2** built
 for **smooth gameplay on low-end PCs**. It combines a 64-chunk render-distance
-unlock with an adaptive FPS governor, a one-command low-end profile, and
-entity, block-entity and particle culling.
+unlock with an adaptive FPS governor, low-end and potato profiles, chunk-update
+budgeting, and entity, block-entity and particle culling.
 
 It is not a cheat and does not need to be installed on the server.
 
 ## Features
 
 - **Low-end PC preset** - `/fpsmaxx lowend` applies Fast graphics, clouds off,
-  minimal particles, no entity shadows or smooth lighting, smaller cull
-  distances, render 16, simulation 8, a 60 FPS target and a 60 FPS cap.
+  cloud distance 2, minimal particles, weather radius 3, no vignette or improved
+  transparency, zero chunk fade, smaller cull distances, render 16, simulation 8,
+  a 60 FPS target, a 60 FPS cap and a 64-section update budget.
+- **Potato preset** - `/fpsmaxx potato` goes further: render 8, simulation 5,
+  entity culling 24, block-entity culling 16, particle culling 8, particle cap
+  400 and a 24-section update budget.
 - **64-chunk render distance** - raises the vanilla slider maximum from 32 to 64.
 - **Configurable simulation distance** - 32 on normal PCs, 8 in low-end mode,
-  memory-capped on small heaps.
+  5 in potato mode, memory-capped on small heaps.
 - **Adaptive visible radius** - chunks stay loaded, but only the radius your GPU
   can afford is drawn. Fog follows the same radius.
-- **Adaptive particle budget** - distant particles are rejected and the live
-  particle cap shrinks automatically when FPS falls.
+- **Adaptive particle budget** - distant particles are rejected and removed, and
+  the live particle cap shrinks automatically when FPS falls.
+- **Chunk-update budgeting** - caps mesh rebuilds per frame and re-queues the
+  rest, smoothing stutter when many sections become dirty at once.
 - **Sodium 0.9.2+ integration** - the same adaptive radius is applied to Sodium's
   terrain search distance and fog. Sodium's render-distance slider is extended to 64.
 - **Iris-friendly** - works on top of Sodium; shader fog can be left alone.
@@ -40,11 +46,20 @@ or mob-AI optimizer.
 - **Entity and block-entity culling** - skips distant entities and block entities
   before extraction and submission.
 - **Particle culling and budgeting** - rejects distant particles before they enter
-  the tick/render queues and caps live particles. The cap falls to 50% when FPS
-  drops, then recovers.
+  the tick/render queues, removes particles that drift outside the radius, and
+  caps live particles. The cap falls to 50% when FPS drops, then recovers.
+- **Chunk-update budgeting** - schedules only the nearest dirty sections each
+  frame and re-queues the rest, smoothing the stutter caused by large mesh-rebuild
+  bursts. This applies to the vanilla chunk renderer; Sodium manages its own
+  chunk builds.
 - **Low-end preset** - applies the vanilla Fast graphics profile plus clouds off,
-  minimal particles, no entity shadows/smooth lighting, biome blend 0, smaller
-  weather radius, entity distance 0.5, render 16, simulation 8 and 60 FPS cap.
+  cloud distance 2, minimal particles, weather radius 3, no vignette or improved
+  transparency, zero chunk fade, no entity shadows/smooth lighting, biome blend 0,
+  mipmaps 0, minimum anisotropic filtering, entity distance 0.5, render 16,
+  simulation 8 and a 60 FPS cap.
+- **Potato preset** - adds render 8, simulation 5, entity culling 24,
+  block-entity culling 16, particle culling 8, particle cap 400 and a 24-section
+  update budget.
 - **Fog matching** - hides the edge of the reduced radius; this is visual, not a
   large FPS gain by itself.
 - **Memory guard** - prevents small heaps from loading more chunks than they can
@@ -52,9 +67,9 @@ or mob-AI optimizer.
 - **Chunk retention** - visible mode avoids repeated chunk load/unload stutter.
 
 It does **not** speed up mob AI, block ticking, world generation or the server.
-Simulation distance 32 is CPU-heavy; `/fpsmaxx lowend` lowers it to 8. The
-governor trades visible draw distance for frame rate while keeping the requested
-chunks loaded.
+Simulation distance 32 is CPU-heavy; `/fpsmaxx lowend` lowers it to 8 and
+`/fpsmaxx potato` to 5. The governor trades visible draw distance for frame rate
+while keeping the requested chunks loaded.
 
 ## Install
 
@@ -64,15 +79,17 @@ chunks loaded.
 4. Put the FPSMaxx jar in your `mods` folder. Delete any older FPSMaxx jar first.
 5. Allocate **4 GB or more** of RAM for 64 chunks (6 GB recommended). A 2 GB
    low-end PC can still play with fewer chunks.
-6. On a low-end PC, run `/fpsmaxx lowend`. Otherwise set **Render Distance** to
-   64; simulation distance is applied automatically.
+6. On a low-end PC, run `/fpsmaxx lowend`; if that is still not smooth, run
+   `/fpsmaxx potato`. Otherwise set **Render Distance** to 64; simulation
+   distance is applied automatically.
 
 ## Commands
 
 | Command | Purpose |
 |---|---|
-| `/fpsmaxx status` | Show visible distance, simulation distance, culls, particle budget, target FPS, and Sodium hook status |
+| `/fpsmaxx status` | Show visible distance, simulation distance, culls, particle budget, section budget, target FPS, and Sodium hook status |
 | `/fpsmaxx lowend` | Apply the complete low-end PC profile |
+| `/fpsmaxx potato` | Apply the extreme low-end profile |
 | `/fpsmaxx balanced` | Restore normal mod-side defaults (vanilla graphics unchanged) |
 | `/fpsmaxx render <2-64>` | Set the requested render distance |
 | `/fpsmaxx mode auto/visible/render` | Choose the adaptive strategy |
@@ -83,6 +100,7 @@ chunks loaded.
 | `/fpsmaxx blockentity <0-512>` | Block-entity cull distance |
 | `/fpsmaxx particles <0-512>` | Particle cull distance |
 | `/fpsmaxx maxparticles <0-20000>` | Live particle cap |
+| `/fpsmaxx sectionbudget <0-512>` | Max chunk-section rebuilds per frame (0 = vanilla) |
 | `/fpsmaxx adaptive <true/false>` | Toggle the adaptive governor |
 | `/fpsmaxx reload` | Reload `config/fpsmaxx.json` |
 
@@ -112,11 +130,13 @@ If Sodium integration reports `no-hook` in `/fpsmaxx status`, use
   refresh rate.
 - **Multiplayer servers control their own view and simulation distance.** FPSMaxx
   cannot force a server to send more chunks.
-- **Simulation distance 32 is CPU-heavy.** Use `/fpsmaxx lowend` or
-  `/fpsmaxx simulation 8` / `12` on weak hardware.
-- **The low-end preset changes vanilla graphics options.** It does not restore
-  them; use Video Settings or `/fpsmaxx balanced` (which only resets FPSMaxx
-  settings) if you want a different balance.
+- **Simulation distance 32 is CPU-heavy.** Use `/fpsmaxx lowend` (simulation 8)
+  or `/fpsmaxx potato` (simulation 5) on weak hardware.
+- **The low-end and potato presets change vanilla graphics options.** They do not
+  restore them; use Video Settings or `/fpsmaxx balanced` (which only resets
+  FPSMaxx settings) if you want a different balance.
+- **A section budget can delay newly loaded chunks.** Lower it for smoother frame
+  times or set it to 0 for vanilla behavior.
 - 64 chunks is roughly 18,000 loaded chunks on both client and integrated server;
   low-memory devices are capped by the memory guard.
 

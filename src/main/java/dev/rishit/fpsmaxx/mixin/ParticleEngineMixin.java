@@ -8,7 +8,7 @@ import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleGroup;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.AABB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -52,10 +52,10 @@ public abstract class ParticleEngineMixin {
 			? 0
 			: Math.max(100, Math.round(config.maxParticles * scale));
 
-		Vec3 center = particle.getBoundingBox().getCenter();
-		double dx = center.x - camera.getX();
-		double dy = center.y - camera.getY();
-		double dz = center.z - camera.getZ();
+		AABB box = particle.getBoundingBox();
+		double dx = (box.minX + box.maxX) * 0.5D - camera.getX();
+		double dy = (box.minY + box.maxY) * 0.5D - camera.getY();
+		double dz = (box.minZ + box.maxZ) * 0.5D - camera.getZ();
 		double distanceSq = dx * dx + dy * dy + dz * dz;
 
 		if (cullDistance > 0 && distanceSq > (double) cullDistance * cullDistance) {
