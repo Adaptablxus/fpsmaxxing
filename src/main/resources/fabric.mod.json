@@ -3,7 +3,7 @@
 	"id": "fpsmaxx",
 	"version": "${version}",
 	"name": "FPSMaxx",
-	"description": "Unlocks render distances up to 64 chunks, keeps simulation distance at 32, holds your FPS with an adaptive governor, and integrates with Sodium, Iris and other optimization mods.",
+	"description": "An optimization mod that unlocks render distances up to 64 chunks, keeps simulation distance at 32, holds your FPS with an adaptive governor, and integrates with Sodium, Iris and other optimization mods.",
 	"authors": [
 		"Rishit"
 	],

@@ -1,9 +1,10 @@
 # FPSMaxx (Minecraft 26.2 / Fabric)
 
-FPSMaxx raises the render-distance slider from 32 to **64 chunks**, keeps
-simulation distance at **32 by default** (vanilla's maximum), and adds an
-adaptive visibility governor that protects your frame rate. It is a
-**client-side** mod: install it on the client, not on the server.
+FPSMaxx is a **client-side Fabric optimization mod** for Minecraft 26.2. It
+raises the render-distance slider from 32 to **64 chunks**, keeps simulation
+distance at **32 by default** (vanilla's maximum), and adds an adaptive
+visibility governor that protects your frame rate. Install it on the client,
+not on the server.
 
 FPSMaxx also detects Sodium, Iris, VulkanMod and common optimization mods. The
 vanilla renderer and Sodium get the smooth visible-radius governor; VulkanMod
@@ -47,13 +48,13 @@ Modrinth: <https://modrinth.com/mod/fpsmaxx>
 | RAM | **4 GB+ allocated** for 64 chunks (6 GB recommended) |
 | CPU | 32 simulation distance is CPU-heavy; lower it on phones |
 | Sodium (optional) | **0.9.2+ for 26.2** (recommended) |
-| Mod | `FPSMaxx-1.2.0-mc26.2.jar` |
+| Mod | `FPSMaxx-1.1.1-mc26.2.jar` |
 
 ## Install — PC (official launcher / Prism / MultiMC)
 
 1. Install Fabric Loader 0.19.3+ for Minecraft 26.2.
 2. Put these two files in the instance's `mods` folder (both are in `dist/mods/`):
-   - `FPSMaxx-1.2.0-mc26.2.jar`
+   - `FPSMaxx-1.1.1-mc26.2.jar`
    - `fabric-api-0.161.0+26.2.jar`
 3. If you use **Sodium**, install **Sodium 0.9.2+ for 26.2** as well. FPSMaxx
    detects it automatically, applies the same adaptive radius to Sodium's
@@ -75,7 +76,7 @@ Modrinth: <https://modrinth.com/mod/fpsmaxx>
    Java 8/17/21. If the launcher does not offer Java 25 yet, the game itself
    cannot run 26.2 on that device — this is not a mod issue.
 2. Install **Fabric Loader 0.19.3+** for **26.2** inside the launcher.
-3. Copy `FPSMaxx-1.2.0-mc26.2.jar` **and** `fabric-api-0.161.0+26.2.jar` into
+3. Copy `FPSMaxx-1.1.1-mc26.2.jar` **and** `fabric-api-0.161.0+26.2.jar` into
    `.minecraft/mods`. If your launcher/GPU supports Sodium 0.9.2+ for 26.2,
    install it too; FPSMaxx will detect it.
 4. Allocate as much RAM as the device allows. 64 chunks is extremely heavy;
@@ -137,6 +138,39 @@ control simulation distance instead, set `"forceSimulationDistance": false` in
   smoothest mode and the one used by default on vanilla/Sodium.
 - `render` — changes the real render distance. Works with any renderer, but
   chunks load/unload as it moves, so expect some stutter. Useful as a fallback.
+
+## How FPSMaxx optimizes
+
+FPSMaxx is a **rendering optimization mod**, not a CPU/mob-AI optimizer. Its
+main win is refusing to submit chunk sections, entities and block entities that
+are outside the radius the GPU can currently afford.
+
+- **Adaptive chunk-section culling** — the largest saving. The client still
+  loads chunks at the selected distance, but `SectionOcclusionGraph` only feeds
+  sections inside the current visible radius to the renderer. Fewer visible
+  sections means fewer terrain draw calls, less GPU work and less chunk-mesh
+  submission work. Because chunks stay loaded, shrinking the radius does not
+  cause chunk-loading stutter.
+- **Sodium integration** — Sodium does not use vanilla's occlusion graph, so
+  FPSMaxx caps Sodium's terrain search distance and fog parameters directly.
+  This gives Sodium the same adaptive radius without unloading chunks.
+- **Entity and block-entity culling** — entities and block entities beyond the
+  configured cull distance are skipped before extraction/submission. This matters
+  at 64 chunks because the server keeps far more entities loaded.
+- **Fog matching** — fog is moved to the same radius as the visible terrain. This
+  is a visual fix (it hides the edge); it is not itself a large FPS gain.
+- **Memory guard** — on small heaps the mod caps loaded chunks and simulation
+  distance before they cause out-of-memory crashes or GC thrashing.
+- **Chunk retention** — the governor changes only the visible radius in
+  `visible` mode, so moving around does not repeatedly load/unload chunks. The
+  `render` fallback is for renderers without a visible-radius hook and does
+  trade smoothness for compatibility.
+
+What it does **not** do: it does not speed up mob AI, block ticking, world
+generation or the server. Simulation distance 32 is expensive, and unlocking 64
+chunks increases load. The governor is the trade-off: it keeps the requested
+distance loaded and reduces only what is drawn. If the FPS target still cannot
+be met, lower simulation distance and the minimum visible distance.
 
 ## How the governor works
 
@@ -264,8 +298,8 @@ entities it does not have.
 ./gradlew build
 ```
 
-The jar is produced at `build/libs/fpsmaxx-1.2.0.jar`; the ready-to-install copy
-is `dist/mods/FPSMaxx-1.2.0-mc26.2.jar`. Toolchain: Gradle 9.7.1,
+The jar is produced at `build/libs/fpsmaxx-1.1.1.jar`; the ready-to-install copy
+is `dist/mods/FPSMaxx-1.1.1-mc26.2.jar`. Toolchain: Gradle 9.7.1,
 Loom 1.18.4, Java 25, Minecraft 26.2 (unobfuscated, Mojang names).
 
 ## License

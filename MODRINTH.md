@@ -1,8 +1,8 @@
 # FPSMaxx
 
-FPSMaxx is a **client-side Fabric mod for Minecraft 26.2** that unlocks a
-64-chunk render distance, keeps simulation distance at 32, and protects your
-frame rate with an adaptive visible-radius governor.
+FPSMaxx is a **client-side Fabric optimization mod for Minecraft 26.2** that
+unlocks a 64-chunk render distance, keeps simulation distance at 32, and
+protects your frame rate with an adaptive visible-radius governor.
 
 It is not a cheat and does not need to be installed on the server.
 
@@ -20,6 +20,26 @@ It is not a cheat and does not need to be installed on the server.
 - **Entity and block-entity culling** - distant entities and block entities are skipped.
 - **Memory guard** - 2 GB gets 32 chunks, 3 GB gets 48, 4 GB+ gets 64.
 - **F6 toggle** and `/fpsmaxx` commands for live tuning.
+
+## How it optimizes
+
+FPSMaxx is a **rendering optimization mod**, not a CPU or mob-AI optimizer.
+
+- **Adaptive chunk-section culling** - chunks stay loaded, but only sections
+  inside the affordable visible radius are submitted to the renderer.
+- **Sodium integration** - caps Sodium's terrain search distance and fog to the
+  same radius, without unloading chunks.
+- **Entity and block-entity culling** - skips distant entities and block entities
+  before extraction and submission.
+- **Fog matching** - hides the edge of the reduced radius; this is visual, not a
+  large FPS gain by itself.
+- **Memory guard** - prevents small heaps from loading more chunks than they can
+  safely hold.
+- **Chunk retention** - visible mode avoids repeated chunk load/unload stutter.
+
+It does **not** speed up mob AI, block ticking, world generation or the server.
+Simulation distance 32 is CPU-heavy; lower it on phones. The governor trades
+visible draw distance for frame rate while keeping the requested chunks loaded.
 
 ## Install
 

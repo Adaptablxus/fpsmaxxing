@@ -35,10 +35,35 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          cat > release-notes.md <<EOF
+          ## FPSMaxx ${VERSION}
+
+          FPSMaxx is a **client-side Fabric optimization mod** for Minecraft 26.2.
+          It unlocks a 64-chunk render distance, keeps simulation distance at 32,
+          and uses an adaptive visible-radius governor to protect frame rate.
+
+          ### How it optimizes
+
+          - **Adaptive chunk-section culling** - chunks stay loaded, but only the
+            affordable visible radius is submitted to the renderer.
+          - **Sodium integration** - caps Sodium's terrain search distance and fog
+            to the same radius without unloading chunks.
+          - **Entity and block-entity culling** - skips distant entities before
+            extraction and submission.
+          - **Memory guard** - prevents small heaps from loading more chunks than
+            they can safely hold.
+          - **Chunk retention** - visible mode avoids repeated load/unload stutter.
+
+          It is a rendering optimization mod, not a mob-AI or server optimizer.
+          Simulation distance 32 is CPU-heavy; lower it on phones.
+
+          **Full documentation:** https://github.com/Adaptablxus/fpsmaxxing
+          **Modrinth:** https://modrinth.com/mod/fpsmaxx
+          EOF
           gh release create "$GITHUB_REF_NAME" \
             "FPSMaxx-${VERSION}-mc26.2.jar" \
             --title "FPSMaxx ${VERSION}" \
-            --notes "FPSMaxx ${VERSION}"
+            --notes-file release-notes.md
 
       - name: Publish to Modrinth
         env:

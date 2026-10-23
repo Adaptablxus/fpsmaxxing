@@ -1,6 +1,5 @@
 # Archived versions
 
-- `FPSMaxx-1.1.0-mc26.2.jar` - archived 1.1.0 build recovered from the local build cache.
-- 1.0.0 - the original jar was deleted before the repository was created and no copy remains locally.
+- `FPSMaxx-1.0.0-mc26.2.jar` - archived 1.0.0 build (formerly labeled 1.1.0), recovered from the local build cache.
 
-The current release is in `dist/mods/`.
+The current 1.1.1 release (formerly labeled 1.2.0) is in `dist/mods/`.
