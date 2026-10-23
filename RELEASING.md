@@ -57,8 +57,9 @@ commit the Modrinth token or any API response scratch files.
 ## Archived versions
 
 - `1.0.0` is archived at `dist/versions/FPSMaxx-1.0.0-mc26.2.jar`. It is published on Modrinth and as a GitHub release. Its tag points to the `archive/1.0.0` branch because the original source snapshot was not preserved.
-- `1.1.1` is the current release. It was previously labeled 1.2.0.
-- The old 1.1.0 and 1.2.0 labels are retired.
+- `1.1.1` is archived at `dist/versions/FPSMaxx-1.1.1-mc26.2.jar`. It was the last release before the low-end optimization pass.
+- `1.2.0` is the current low-end optimization release. It adds the `/fpsmaxx lowend` preset, particle culling/budgeting, first-run low-end defaults, and broader vanilla graphics reductions.
+- The old 1.1.0 label and the old 1.2.0 release are retired. The new `1.2.0` tag points to this low-end source release.
 
 ## Notes
 
@@ -67,3 +68,6 @@ commit the Modrinth token or any API response scratch files.
   same ready-to-install artifacts as the release.
 - Sodium is optional and is not bundled. The release jar has only FPSMaxx and
   compile-only references to Sodium.
+- Before tagging, test `/fpsmaxx lowend`, `/fpsmaxx balanced`, and
+  `/fpsmaxx status` on a small-heap instance. The status output should show
+  low-end state, particle cull/cap, and the adaptive particle percentage.

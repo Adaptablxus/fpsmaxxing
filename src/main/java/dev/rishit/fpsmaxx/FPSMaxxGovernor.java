@@ -27,6 +27,7 @@ public final class FPSMaxxGovernor {
 	private static int goodStreak;
 	private static ClientLevel lastLevel;
 	private static String lastEffectiveMode;
+	private static float particleScale = 1.0F;
 
 	private FPSMaxxGovernor() {
 	}
@@ -67,12 +68,14 @@ public final class FPSMaxxGovernor {
 			rampCooldownUntil = 0L;
 			settleUntil = now + 4000L;
 			goodStreak = 0;
+			particleScale = 1.0F;
 			invalidateSectionGraph();
 			return;
 		}
 
 		if (!config.adaptiveEnabled) {
 			visibleDistance = -1;
+			particleScale = 1.0F;
 			return;
 		}
 
@@ -105,6 +108,18 @@ public final class FPSMaxxGovernor {
 
 		int target = effectiveTargetFps(client, config);
 		int next = visibleDistance;
+
+		// Particle work is a smaller lever than terrain, but it reacts faster
+		// and helps when the CPU is saturated by weather or large farms.
+		if (config.adaptiveParticles) {
+			if (fps < target - 10) {
+				particleScale = Math.max(0.5F, particleScale - 0.1F);
+			} else if (fps > target + 10) {
+				particleScale = Math.min(1.0F, particleScale + 0.05F);
+			}
+		} else {
+			particleScale = 1.0F;
+		}
 
 		if (fps < target - 5) {
 			// Drop fast when below target. Compiling newly visible chunk meshes
@@ -262,6 +277,11 @@ public final class FPSMaxxGovernor {
 		return visibleDistance;
 	}
 
+	/** 1.0 = full particle budget, 0.5 = the low-end floor. */
+	public static float particleScale() {
+		return particleScale;
+	}
+
 	/**
 	 * Fog must match the reduced visible radius or the world edge becomes visible.
 	 */
@@ -283,6 +303,7 @@ public final class FPSMaxxGovernor {
 		rampCooldownUntil = 0L;
 		settleUntil = 0L;
 		goodStreak = 0;
+		particleScale = 1.0F;
 		invalidateSectionGraph();
 	}
 

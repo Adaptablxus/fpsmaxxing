@@ -24,6 +24,9 @@ public final class FPSMaxxConfig {
 
 	private static FPSMaxxConfig instance;
 
+	/** Informational flag set by the low-end preset. */
+	public boolean lowEndMode = false;
+
 	public int targetFps = FPSMaxxConstants.DEFAULT_TARGET_FPS;
 
 	public boolean adaptiveEnabled = true;
@@ -68,6 +71,15 @@ public final class FPSMaxxConfig {
 	/** Block entities farther away than this (in blocks) are not rendered. 0 = off. */
 	public int blockEntityCullDistance = 96;
 
+	/** Particles farther away than this (in blocks) are not created. 0 = off. */
+	public int particleCullDistance = 64;
+
+	/** Maximum live particles. 0 = use vanilla's own limits only. */
+	public int maxParticles = 4000;
+
+	/** Let the governor reduce the particle budget when FPS falls below target. */
+	public boolean adaptiveParticles = true;
+
 	public static FPSMaxxConfig get() {
 		if (instance == null) {
 			load();
@@ -76,7 +88,8 @@ public final class FPSMaxxConfig {
 	}
 
 	public static synchronized void load() {
-		if (Files.exists(PATH)) {
+		boolean fresh = !Files.exists(PATH);
+		if (!fresh) {
 			try {
 				String json = Files.readString(PATH, StandardCharsets.UTF_8);
 				FPSMaxxConfig loaded = GSON.fromJson(json, FPSMaxxConfig.class);
@@ -90,10 +103,55 @@ public final class FPSMaxxConfig {
 
 		if (instance == null) {
 			instance = new FPSMaxxConfig();
+			fresh = true;
+		}
+
+		if (fresh && FPSMaxxConstants.LOW_END_DEVICE) {
+			instance.applyLowEndDefaults();
 		}
 
 		instance.sanitize();
 		instance.save();
+	}
+
+	/** Mod-side defaults for a low-end machine. Vanilla graphics are applied by /fpsmaxx lowend. */
+	public void applyLowEndDefaults() {
+		lowEndMode = true;
+		targetFps = FPSMaxxConstants.LOW_END_TARGET_FPS;
+		adaptiveEnabled = true;
+		initialVisibleDistance = FPSMaxxConstants.LOW_END_INITIAL_VISIBLE_DISTANCE;
+		minVisibleDistance = FPSMaxxConstants.LOW_END_MIN_VISIBLE_DISTANCE;
+		simulationDistance = FPSMaxxConstants.LOW_END_SIMULATION_DISTANCE;
+		forceSimulationDistance = true;
+		adaptiveMode = "auto";
+		sodiumIntegration = true;
+		sodiumConfigOverlay = true;
+		matchFogToVisibleDistance = true;
+		entityCullDistance = FPSMaxxConstants.LOW_END_ENTITY_CULL_DISTANCE;
+		blockEntityCullDistance = FPSMaxxConstants.LOW_END_BLOCK_ENTITY_CULL_DISTANCE;
+		particleCullDistance = FPSMaxxConstants.LOW_END_PARTICLE_CULL_DISTANCE;
+		maxParticles = FPSMaxxConstants.LOW_END_MAX_PARTICLES;
+		adaptiveParticles = true;
+	}
+
+	/** Mod-side defaults for a normal PC. Vanilla graphics are left untouched. */
+	public void applyBalancedDefaults() {
+		lowEndMode = false;
+		targetFps = FPSMaxxConstants.BALANCED_TARGET_FPS;
+		adaptiveEnabled = true;
+		initialVisibleDistance = FPSMaxxConstants.BALANCED_INITIAL_VISIBLE_DISTANCE;
+		minVisibleDistance = FPSMaxxConstants.BALANCED_MIN_VISIBLE_DISTANCE;
+		simulationDistance = FPSMaxxConstants.MAX_SIMULATION_DISTANCE;
+		forceSimulationDistance = true;
+		adaptiveMode = "auto";
+		sodiumIntegration = true;
+		sodiumConfigOverlay = true;
+		matchFogToVisibleDistance = true;
+		entityCullDistance = FPSMaxxConstants.BALANCED_ENTITY_CULL_DISTANCE;
+		blockEntityCullDistance = FPSMaxxConstants.BALANCED_BLOCK_ENTITY_CULL_DISTANCE;
+		particleCullDistance = FPSMaxxConstants.BALANCED_PARTICLE_CULL_DISTANCE;
+		maxParticles = FPSMaxxConstants.BALANCED_MAX_PARTICLES;
+		adaptiveParticles = true;
 	}
 
 	public void sanitize() {
@@ -113,12 +171,10 @@ public final class FPSMaxxConfig {
 		} else {
 			adaptiveMode = adaptiveMode.toLowerCase(Locale.ROOT);
 		}
-		if (entityCullDistance < 0) {
-			entityCullDistance = 0;
-		}
-		if (blockEntityCullDistance < 0) {
-			blockEntityCullDistance = 0;
-		}
+		entityCullDistance = clamp(entityCullDistance, 0, 512);
+		blockEntityCullDistance = clamp(blockEntityCullDistance, 0, 512);
+		particleCullDistance = clamp(particleCullDistance, 0, 512);
+		maxParticles = maxParticles == 0 ? 0 : clamp(maxParticles, 100, 20000);
 	}
 
 	public synchronized void save() {

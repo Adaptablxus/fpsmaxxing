@@ -16,16 +16,18 @@ fi
 jq -n \
   --arg name "FPSMaxx ${VERSION}" \
   --arg version "${VERSION}" \
-  --arg changelog "FPSMaxx ${VERSION} is a client-side Fabric optimization mod for Minecraft 26.2.
+  --arg changelog "FPSMaxx ${VERSION} is a client-side Fabric optimization mod for Minecraft 26.2, built for smooth gameplay on low-end PCs.
 
 How it optimizes:
+- Low-end preset: /fpsmaxx lowend applies Fast graphics, clouds off, minimal particles, render 16, simulation 8 and a 60 FPS target.
 - Adaptive chunk-section culling: chunks stay loaded, but only the affordable visible radius is submitted to the renderer.
+- Particle culling and budgeting: rejects distant particles and shrinks the live cap when FPS falls.
 - Sodium integration: caps Sodium's terrain search distance and fog to the same radius without unloading chunks.
 - Entity and block-entity culling: skips distant entities before extraction and submission.
 - Memory guard: prevents small heaps from loading more chunks than they can safely hold.
 - Chunk retention: visible mode avoids repeated load/unload stutter.
 
-It is a rendering optimization mod, not a mob-AI or server optimizer. Simulation distance 32 is CPU-heavy; lower it on phones.
+It is a rendering optimization mod, not a mob-AI or server optimizer. Simulation distance 32 is CPU-heavy; the low-end preset lowers it to 8.
 
 Full notes: https://github.com/Adaptablxus/fpsmaxxing/releases/tag/v${VERSION}" \
   --arg project_id "${PROJECT_ID}" \

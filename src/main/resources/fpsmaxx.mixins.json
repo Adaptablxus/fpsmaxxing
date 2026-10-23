@@ -13,6 +13,7 @@
 		"IntegratedServerMixin",
 		"LevelExtractorMixin",
 		"OptionsMixin",
+		"ParticleEngineMixin",
 		"PlayerListMixin",
 		"SectionOcclusionGraphMixin"
 	],

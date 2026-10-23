@@ -122,6 +122,39 @@ public final class FPSMaxxCommands {
 						).withStyle(ChatFormatting.GREEN));
 						return 1;
 					})))
+				.then(ClientCommands.literal("particles")
+					.then(ClientCommands.argument("blocks", IntegerArgumentType.integer(0, 512)).executes(ctx -> {
+						FPSMaxxConfig config = FPSMaxxConfig.get();
+						config.particleCullDistance = IntegerArgumentType.getInteger(ctx, "blocks");
+						config.save();
+						ctx.getSource().sendFeedback(Component.literal(
+							"FPSMaxx particle cull distance set to " + config.particleCullDistance + " blocks (0 = off)"
+						).withStyle(ChatFormatting.GREEN));
+						return 1;
+					})))
+				.then(ClientCommands.literal("maxparticles")
+					.then(ClientCommands.argument("count", IntegerArgumentType.integer(0, 20000)).executes(ctx -> {
+						FPSMaxxConfig config = FPSMaxxConfig.get();
+						config.maxParticles = IntegerArgumentType.getInteger(ctx, "count");
+						config.sanitize();
+						config.save();
+						ctx.getSource().sendFeedback(Component.literal(
+							"FPSMaxx particle cap set to " + config.maxParticles + " (0 = vanilla limits only)"
+						).withStyle(ChatFormatting.GREEN));
+						return 1;
+					})))
+				.then(ClientCommands.literal("lowend").executes(ctx -> {
+					ctx.getSource().sendFeedback(Component.literal(
+						FPSMaxxPresets.applyLowEnd(ctx.getSource().getClient())
+					).withStyle(ChatFormatting.GREEN));
+					return 1;
+				}))
+				.then(ClientCommands.literal("balanced").executes(ctx -> {
+					ctx.getSource().sendFeedback(Component.literal(
+						FPSMaxxPresets.applyBalanced(ctx.getSource().getClient())
+					).withStyle(ChatFormatting.GREEN));
+					return 1;
+				}))
 				.then(ClientCommands.literal("reload").executes(ctx -> {
 					FPSMaxxConfig.load();
 					FPSMaxxGovernor.onAdaptiveToggled();
@@ -157,12 +190,18 @@ public final class FPSMaxxCommands {
 				+ ", config " + (FPSMaxxCompat.sodiumConfigHook() ? "hooked" : "no-hook");
 		source.sendFeedback(Component.literal(
 			"mode " + FPSMaxxGovernor.effectiveMode()
+				+ " | low-end " + (config.lowEndMode ? "on" : "off")
 				+ " | max slider " + FPSMaxxConstants.MAX_RENDER_DISTANCE
 				+ " | min " + config.minVisibleDistance
 				+ " | sim " + config.simulationDistance
 				+ (config.forceSimulationDistance ? " (forced)" : " (manual)")
 				+ " | entity cull " + config.entityCullDistance
 				+ " | block entity cull " + config.blockEntityCullDistance
+				+ " | particles " + config.particleCullDistance + " blocks / "
+				+ config.maxParticles + " cap"
+				+ (config.adaptiveParticles
+					? " (" + Math.round(FPSMaxxGovernor.particleScale() * 100.0F) + "%)"
+					: "")
 				+ " | sodium " + sodium
 		).withStyle(ChatFormatting.GRAY));
 	}

@@ -20,8 +20,47 @@ public final class FPSMaxxConstants {
 	/** Default FPS the adaptive governor tries to hold. */
 	public static final int DEFAULT_TARGET_FPS = 65;
 
+	/** Low-end preset values. These favour stable frame times over draw distance. */
+	public static final int LOW_END_TARGET_FPS = 60;
+	public static final int LOW_END_INITIAL_VISIBLE_DISTANCE = 8;
+	public static final int LOW_END_MIN_VISIBLE_DISTANCE = 4;
+	public static final int LOW_END_SIMULATION_DISTANCE = 8;
+	public static final int LOW_END_ENTITY_CULL_DISTANCE = 48;
+	public static final int LOW_END_BLOCK_ENTITY_CULL_DISTANCE = 32;
+	public static final int LOW_END_PARTICLE_CULL_DISTANCE = 24;
+	public static final int LOW_END_MAX_PARTICLES = 1200;
+	public static final int LOW_END_RENDER_DISTANCE = 16;
+
+	/** Balanced preset values for normal PCs. */
+	public static final int BALANCED_TARGET_FPS = 65;
+	public static final int BALANCED_INITIAL_VISIBLE_DISTANCE = 32;
+	public static final int BALANCED_MIN_VISIBLE_DISTANCE = 8;
+	public static final int BALANCED_ENTITY_CULL_DISTANCE = 96;
+	public static final int BALANCED_BLOCK_ENTITY_CULL_DISTANCE = 96;
+	public static final int BALANCED_PARTICLE_CULL_DISTANCE = 64;
+	public static final int BALANCED_MAX_PARTICLES = 4000;
+
+	/**
+	 * A conservative hardware check used only for first-run defaults. It does
+	 * not change an existing config; players can always run /fpsmaxx lowend or
+	 * /fpsmaxx balanced themselves.
+	 */
+	public static final boolean LOW_END_DEVICE = detectLowEndDevice();
+
 	/** Extra ticket-tracker range so chunks at exactly 64 are tracked too. */
 	public static final int TICKET_RANGE = MAX_RENDER_DISTANCE + 4;
+
+	private static boolean detectLowEndDevice() {
+		if (Boolean.getBoolean("fpsmaxx.forceLowEnd")) {
+			return true;
+		}
+		if (Boolean.getBoolean("fpsmaxx.forceBalanced")) {
+			return false;
+		}
+		int processors = Runtime.getRuntime().availableProcessors();
+		long heapMb = Runtime.getRuntime().maxMemory() / (1024L * 1024L);
+		return processors <= 4 || heapMb <= 2048L;
+	}
 
 	/**
 	 * Loading 64 chunks is memory-hungry: the client stores ~18,000 chunks and
