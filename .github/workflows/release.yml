@@ -44,10 +44,10 @@ jobs:
 
           ### How it optimizes
 
-          - **Low-end preset** - `/fpsmaxx lowend` applies Fast graphics, clouds
+          - **Low-end preset** - \`/fpsmaxx lowend\` applies Fast graphics, clouds
             off, cloud distance 2, minimal particles, render 16, simulation 8 and
             a 60 FPS target.
-          - **Potato preset** - `/fpsmaxx potato` goes to render 8, simulation 5,
+          - **Potato preset** - \`/fpsmaxx potato\` goes to render 8, simulation 5,
             tiny cull distances and a 24-section update budget.
           - **Adaptive chunk-section culling** - chunks stay loaded, but only the
             affordable visible radius is submitted to the renderer.
