@@ -1,0 +1,33 @@
+{
+	"schemaVersion": 1,
+	"id": "fpsmaxx",
+	"version": "${version}",
+	"name": "FPSMaxx",
+	"description": "Unlocks render distances up to 64 chunks, keeps simulation distance at 32, holds your FPS with an adaptive governor, and integrates with Sodium, Iris and other optimization mods.",
+	"authors": [
+		"Rishit"
+	],
+	"license": "CC0-1.0",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"dev.rishit.fpsmaxx.FPSMaxxClient"
+		],
+		"sodium:config_api_user": [
+			"dev.rishit.fpsmaxx.compat.FPSMaxxSodiumConfig"
+		]
+	},
+	"mixins": [
+		"fpsmaxx.mixins.json",
+		"fpsmaxx-sodium.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"sodium": ">=0.9.2"
+	}
+}

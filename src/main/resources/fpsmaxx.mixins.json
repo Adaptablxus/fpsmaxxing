@@ -1,0 +1,22 @@
+{
+	"required": false,
+	"minVersion": "0.8",
+	"package": "dev.rishit.fpsmaxx.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"mixins": [],
+	"client": [
+		"BlockEntityRenderDispatcherMixin",
+		"ChunkMapMixin",
+		"ChunkTaskPriorityQueueMixin",
+		"DistanceManagerMixin",
+		"GameRendererMixin",
+		"IntegratedServerMixin",
+		"LevelExtractorMixin",
+		"OptionsMixin",
+		"PlayerListMixin",
+		"SectionOcclusionGraphMixin"
+	],
+	"injectors": {
+		"defaultRequire": 0
+	}
+}
