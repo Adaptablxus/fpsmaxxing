@@ -16,7 +16,8 @@ chunk-update budget, together with the low-end graphics reductions. The normal
 presets (Fast, Fancy, Fabulous, Custom) still work to the right of it.
 
 Sodium replaces vanilla's Video Settings screen. With Sodium installed, open
-**Video Settings -> FPSMaxx** for the same five-position slider.
+**Video Settings**, select **FPSMaxx** in the left sidebar, then click
+**Open FPSMaxx preset screen**. You can also run `/fpsmaxx preset` from chat.
 
 ## Fresh & Smooth
 

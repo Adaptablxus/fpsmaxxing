@@ -31,7 +31,8 @@ chunk-update budget, together with the low-end graphics reductions. The normal
 presets (Fast, Fancy, Fabulous, Custom) still work to the right of it.
 
 Sodium replaces vanilla's Video Settings screen. With Sodium installed, open
-**Video Settings → FPSMaxx** to get the same five-position slider.
+**Video Settings**, select **FPSMaxx** in the left sidebar, then click
+**Open FPSMaxx preset screen**. You can also run `/fpsmaxx preset` from chat.
 
 If the **Fresh & Smooth** modpack is detected, the FpsMaxx position
 automatically uses a visual-safe profile: the pack's shaders, particles,
@@ -76,7 +77,7 @@ Modrinth: <https://modrinth.com/mod/fpsmaxx>
 | RAM | **4 GB+ allocated** for 64 chunks (6 GB recommended) |
 | CPU | 32 simulation distance is CPU-heavy; use `/fpsmaxx lowend` on weak PCs |
 | Sodium (optional) | **0.9.1+ for 26.2** (recommended) |
-| Mod | `FPSMaxx-1.4.0-mc26.2.jar` |
+| Mod | `FPSMaxx-1.4.1-mc26.2.jar` |
 
 ## Low-end PC quick start
 
@@ -128,7 +129,7 @@ with `-Dfpsmaxx.forceLowEnd=true` or `-Dfpsmaxx.forceBalanced=true`.
 
 1. Install Fabric Loader 0.19.3+ for Minecraft 26.2.
 2. Put these two files in the instance's `mods` folder (both are in `dist/mods/`):
-   - `FPSMaxx-1.4.0-mc26.2.jar`
+   - `FPSMaxx-1.4.1-mc26.2.jar`
    - `fabric-api-0.161.0+26.2.jar`
 3. If you use **Sodium**, install **Sodium 0.9.1+ for 26.2** as well. FPSMaxx
    detects it automatically, applies the same adaptive radius to Sodium's
@@ -152,7 +153,7 @@ with `-Dfpsmaxx.forceLowEnd=true` or `-Dfpsmaxx.forceBalanced=true`.
    Java 8/17/21. If the launcher does not offer Java 25 yet, the game itself
    cannot run 26.2 on that device — this is not a mod issue.
 2. Install **Fabric Loader 0.19.3+** for **26.2** inside the launcher.
-3. Copy `FPSMaxx-1.4.0-mc26.2.jar` **and** `fabric-api-0.161.0+26.2.jar` into
+3. Copy `FPSMaxx-1.4.1-mc26.2.jar` **and** `fabric-api-0.161.0+26.2.jar` into
    `.minecraft/mods`. If your launcher/GPU supports Sodium 0.9.1+ for 26.2,
    install it too; FPSMaxx will detect it.
 4. Allocate as much RAM as the device allows. 64 chunks is extremely heavy;
@@ -458,8 +459,8 @@ entities it does not have.
 ./gradlew build
 ```
 
-The jar is produced at `build/libs/fpsmaxx-1.4.0.jar`; the ready-to-install copy
-is `dist/mods/FPSMaxx-1.4.0-mc26.2.jar`. Toolchain: Gradle 9.7.1,
+The jar is produced at `build/libs/fpsmaxx-1.4.1.jar`; the ready-to-install copy
+is `dist/mods/FPSMaxx-1.4.1-mc26.2.jar`. Toolchain: Gradle 9.7.1,
 Loom 1.18.4, Java 25, Minecraft 26.2 (unobfuscated, Mojang names).
 
 ## License

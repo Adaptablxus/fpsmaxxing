@@ -2,6 +2,8 @@
 	"key.fpsmaxx.toggle": "Toggle FPSMaxx adaptive mode",
 	"fpsmaxx.screen.title": "FPSMaxx Graphics Preset",
 	"fpsmaxx.sodium.page": "FPSMaxx",
+	"fpsmaxx.sodium.open": "Open FPSMaxx preset screen",
+	"fpsmaxx.sodium.open.tooltip": "Choose FpsMaxx, Fast, Fancy, Fabulous or Custom. FpsMaxx applies the hidden optimization profile.",
 	"options.graphics.fpsmaxx": "FpsMaxx",
 	"options.graphics.fpsmaxx.tooltip": "FPSMaxx: applies every FPSMaxx optimization, including culling, particle limits and chunk-update budgeting that the normal graphics presets cannot reach.",
 	"options.graphics.fpsmaxx.tooltip.freshsmooth": "FPSMaxx (Fresh & Smooth safe): applies the FPSMaxx governor, culling and chunk budget while preserving the pack's shaders, particles and animations."

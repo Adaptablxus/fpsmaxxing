@@ -6,6 +6,7 @@ import dev.rishit.fpsmaxx.FPSMaxxPresetScreen;
 import net.caffeinemc.mods.sodium.api.config.ConfigEntryPoint;
 import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.ModOptionsBuilder;
+import net.caffeinemc.mods.sodium.api.config.structure.OptionPageBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -27,6 +28,8 @@ public final class FPSMaxxSodiumConfig implements ConfigEntryPoint {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FPSMaxxConstants.MOD_ID);
 	private static final Identifier RENDER_DISTANCE =
 		Identifier.fromNamespaceAndPath("sodium", "general.render_distance");
+	private static final Identifier OPEN_PRESET =
+		Identifier.fromNamespaceAndPath(FPSMaxxConstants.MOD_ID, "open_preset");
 
 	@Override
 	public void registerConfigLate(ConfigBuilder builder) {
@@ -52,13 +55,17 @@ public final class FPSMaxxSodiumConfig implements ConfigEntryPoint {
 				LOGGER.info("C2ME detected; leaving Sodium's render-distance slider to C2ME");
 			}
 
-			modOptions.addPage(
-				builder.createExternalPage()
-					.setName(Component.translatable("fpsmaxx.sodium.page"))
-					.setScreenConsumer(parent -> Minecraft.getInstance().setScreenAndShow(
-						new FPSMaxxPresetScreen(parent)
-					))
-			);
+			OptionPageBuilder page = builder.createOptionPage()
+				.setName(Component.translatable("fpsmaxx.sodium.page"))
+				.addOption(
+					builder.createExternalButtonOption(OPEN_PRESET)
+						.setName(Component.translatable("fpsmaxx.sodium.open"))
+						.setTooltip(Component.translatable("fpsmaxx.sodium.open.tooltip"))
+						.setScreenConsumer(parent -> Minecraft.getInstance().setScreenAndShow(
+							new FPSMaxxPresetScreen(parent)
+						))
+				);
+			modOptions.addPage(page);
 			LOGGER.info("FPSMaxx preset page registered in Sodium's video settings (v{})", version);
 		} catch (Throwable throwable) {
 			LOGGER.warn(

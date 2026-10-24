@@ -60,8 +60,9 @@ jobs:
           - **Particle culling and budgeting** - rejects and removes distant
             particles, and shrinks the live cap when FPS falls.
           - **Sodium integration** - caps Sodium's terrain search distance and fog
-            to the same radius without unloading chunks, and adds an FPSMaxx page
-            to Sodium's Video Settings.
+            to the same radius without unloading chunks, and adds a searchable
+            FPSMaxx page with an **Open FPSMaxx preset screen** button to Sodium's
+            Video Settings.
           - **Fresh & Smooth aware** - auto-detects the pack and keeps its shaders,
             particles and animations with a visual-safe profile.
           - **Particle optimizer aware** - defers particle culling to AsyncParticles
