@@ -26,8 +26,9 @@ same jars are uploaded to Modrinth.
    Keep the matching `fabric-api-<version>+26.3.jar` in `dist/mods/` for offline
    installs. NeoForge does not need Fabric API.
 
-4. Move the previous release jars from `dist/mods/` into `dist/versions/` and add
-   them to `dist/versions/README.md`.
+4. Move the previous release jars from `dist/mods/` into `dist/versions/`,
+   remove the previous root convenience jars, and update
+   `dist/versions/README.md`.
 5. Commit everything:
 
    ```powershell
