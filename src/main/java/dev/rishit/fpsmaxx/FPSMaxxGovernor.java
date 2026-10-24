@@ -153,7 +153,7 @@ public final class FPSMaxxGovernor {
 		}
 
 		if (next != visibleDistance) {
-			FPSMaxxClient.LOGGER.debug(
+			FPSMaxxBootstrap.LOGGER.debug(
 				"{} distance {} -> {} chunks (FPS {}, target {})",
 				renderDistanceMode() ? "Render" : "Visible",
 				visibleDistance,
@@ -187,7 +187,7 @@ public final class FPSMaxxGovernor {
 		if (client.options.simulationDistance().get() != target) {
 			client.options.simulationDistance().set(target);
 			client.options.save();
-			FPSMaxxClient.LOGGER.info("Simulation distance set to {} chunks", target);
+			FPSMaxxBootstrap.LOGGER.info("Simulation distance set to {} chunks", target);
 		}
 		return target;
 	}
@@ -244,7 +244,7 @@ public final class FPSMaxxGovernor {
 	public static int effectiveTargetFps(Minecraft client, FPSMaxxConfig config) {
 		int target = config.targetFps;
 		if (client.options.enableVsync().get()) {
-			int refresh = client.getWindow().getRefreshRate();
+			int refresh = (int) client.getWindow().getActiveVideoMode().getRefreshRate();
 			if (refresh <= 0) {
 				refresh = 60;
 			}

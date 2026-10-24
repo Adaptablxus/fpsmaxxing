@@ -1,0 +1,80 @@
+plugins {
+	id 'java-library'
+	id 'net.neoforged.moddev' version '2.0.148'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+	archivesName = "${mod_id}-neoforge"
+}
+
+java {
+	toolchain.languageVersion = JavaLanguageVersion.of(25)
+	withSourcesJar()
+}
+
+repositories {
+	maven {
+		name = 'CaffeineMC'
+		url = 'https://maven.caffeinemc.net/releases'
+	}
+}
+
+neoForge {
+	version = project.neo_version
+
+	runs {
+		client {
+			client()
+			// Dev-only shortcut so runtime checks start inside the test world.
+			programArguments.addAll '--quickPlaySingleplayer', 'New World'
+		}
+	}
+
+	mods {
+		"${mod_id}" {
+			sourceSet(sourceSets.main)
+		}
+	}
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir '../src/main/java'
+
+			// Loader-specific entrypoints are supplied by this project instead.
+			exclude 'dev/rishit/fpsmaxx/FPSMaxxClient.java'
+			exclude 'dev/rishit/fpsmaxx/FPSMaxxCommands.java'
+			exclude 'dev/rishit/fpsmaxx/compat/FPSMaxxSodiumConfig.java'
+		}
+		resources {
+			srcDir '../src/main/resources'
+			exclude 'fabric.mod.json'
+		}
+	}
+}
+
+dependencies {
+	// Compile-only so the shared governor can call the Sodium terrain hook.
+	// At runtime NeoForge Sodium supplies the same class names.
+	compileOnly "net.caffeinemc:sodium-fabric:0.9.3-beta.1+mc26.3"
+	compileOnly "net.caffeinemc:sodium-neoforge-api:0.9.3-beta.1+mc26.3"
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+	options.release = 25
+}
+
+// NeoForge's asset downloader defaults to a Java 21 toolchain. This machine
+// only has Java 25, which is also the version Minecraft 26.3 requires.
+tasks.withType(net.neoforged.nfrtgradle.DownloadAssets).configureEach {
+	javaExecutable.set(
+		javaToolchains.launcherFor {
+			languageVersion = JavaLanguageVersion.of(25)
+		}.get().executablePath.toString()
+	)
+}

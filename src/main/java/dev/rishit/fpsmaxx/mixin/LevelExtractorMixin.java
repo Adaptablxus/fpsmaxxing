@@ -83,7 +83,14 @@ public abstract class LevelExtractorMixin {
 
 	@Inject(method = "isEntityVisible", at = @At("RETURN"), cancellable = true)
 	private void fpsmaxx$cullDistantEntities(
-		Entity entity, Frustum frustum, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir
+		Entity entity,
+		Frustum frustum,
+		double camX,
+		double camY,
+		double camZ,
+		float partialTick,
+		long entityId,
+		CallbackInfoReturnable<Boolean> cir
 	) {
 		if (!cir.getReturnValue()) {
 			return;

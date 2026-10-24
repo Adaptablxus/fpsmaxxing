@@ -1,6 +1,6 @@
 package dev.rishit.fpsmaxx.compat;
 
-import net.fabricmc.loader.api.FabricLoader;
+import dev.rishit.fpsmaxx.FPSMaxxPlatform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +58,7 @@ public final class FPSMaxxCompat {
 	}
 
 	private static boolean isLoaded(String modId) {
-		return FabricLoader.getInstance().isModLoaded(modId);
+		return FPSMaxxPlatform.isModLoaded(modId);
 	}
 
 	public static void markSodiumTerrainHook() {

@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import dev.rishit.fpsmaxx.compat.FPSMaxxCompat;
-import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +20,12 @@ import java.util.Locale;
 public final class FPSMaxxConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FPSMaxxConstants.MOD_ID);
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("fpsmaxx.json");
 
 	private static FPSMaxxConfig instance;
+
+	private static Path path() {
+		return FPSMaxxPlatform.configDir().resolve("fpsmaxx.json");
+	}
 
 	/** Informational flag set by the low-end preset. */
 	public boolean lowEndMode = false;
@@ -113,16 +115,17 @@ public final class FPSMaxxConfig {
 	}
 
 	public static synchronized void load() {
-		boolean fresh = !Files.exists(PATH);
+		Path path = path();
+		boolean fresh = !Files.exists(path);
 		if (!fresh) {
 			try {
-				String json = Files.readString(PATH, StandardCharsets.UTF_8);
+				String json = Files.readString(path, StandardCharsets.UTF_8);
 				FPSMaxxConfig loaded = GSON.fromJson(json, FPSMaxxConfig.class);
 				if (loaded != null) {
 					instance = loaded;
 				}
 			} catch (IOException | JsonSyntaxException e) {
-				LOGGER.warn("Could not read {}, using defaults", PATH, e);
+				LOGGER.warn("Could not read {}, using defaults", path, e);
 			}
 		}
 
@@ -255,11 +258,12 @@ public final class FPSMaxxConfig {
 	}
 
 	public synchronized void save() {
+		Path path = path();
 		try {
-			Files.createDirectories(PATH.getParent());
-			Files.writeString(PATH, GSON.toJson(this), StandardCharsets.UTF_8);
+			Files.createDirectories(path.getParent());
+			Files.writeString(path, GSON.toJson(this), StandardCharsets.UTF_8);
 		} catch (IOException e) {
-			LOGGER.warn("Could not save {}", PATH, e);
+			LOGGER.warn("Could not save {}", path, e);
 		}
 	}
 
