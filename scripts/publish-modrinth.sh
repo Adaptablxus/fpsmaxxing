@@ -19,12 +19,15 @@ jq -n \
   --arg changelog "FPSMaxx ${VERSION} is a client-side Fabric optimization mod for Minecraft 26.2, built for smooth gameplay on low-end PCs.
 
 How it optimizes:
+- Hidden FpsMaxx preset: drag the Graphics Preset slider all the way left. The FpsMaxx position applies the adaptive governor, all cull distances, the particle budget and the chunk-update budget together with the low-end graphics reductions.
 - Low-end preset: /fpsmaxx lowend applies Fast graphics, clouds off, cloud distance 2, minimal particles, render 16, simulation 8 and a 60 FPS target.
 - Potato preset: /fpsmaxx potato goes to render 8, simulation 5, tiny cull distances and a 24-section update budget.
 - Adaptive chunk-section culling: chunks stay loaded, but only the affordable visible radius is submitted to the renderer.
 - Chunk-update budgeting: caps mesh rebuilds per frame and re-queues the rest, smoothing stutter.
 - Particle culling and budgeting: rejects and removes distant particles, and shrinks the live cap when FPS falls.
-- Sodium integration: caps Sodium's terrain search distance and fog to the same radius without unloading chunks.
+- Sodium integration: caps Sodium's terrain search distance and fog to the same radius without unloading chunks, and adds an FPSMaxx page to Sodium's Video Settings.
+- Fresh & Smooth aware: auto-detects the pack and keeps its shaders, particles and animations with a visual-safe profile.
+- Particle optimizer aware: defers particle culling to AsyncParticles or Particle Core when installed.
 - Entity and block-entity culling: skips distant entities before extraction and submission.
 - Memory guard: prevents small heaps from loading more chunks than they can safely hold.
 - Chunk retention: visible mode avoids repeated load/unload stutter.

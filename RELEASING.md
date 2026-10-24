@@ -59,8 +59,9 @@ commit the Modrinth token or any API response scratch files.
 - `1.0.0` is archived at `dist/versions/FPSMaxx-1.0.0-mc26.2.jar`. It is published on Modrinth and as a GitHub release. Its tag points to the `archive/1.0.0` branch because the original source snapshot was not preserved.
 - `1.1.1` is archived at `dist/versions/FPSMaxx-1.1.1-mc26.2.jar`. It was the last release before the low-end optimization pass.
 - `1.2.0` is archived at `dist/versions/FPSMaxx-1.2.0-mc26.2.jar`. It added the `/fpsmaxx lowend` preset, particle culling/budgeting, first-run low-end defaults, and broader vanilla graphics reductions.
-- `1.3.0` is the current release. It adds the `/fpsmaxx potato` preset, chunk-update budgeting, removal of far particles, stronger low-end graphics reductions, and the `/fpsmaxx sectionbudget` command.
-- The old 1.1.0 label and the old 1.2.0 release are retired. The current `1.3.0` tag points to this source release.
+- `1.3.0` is archived at `dist/versions/FPSMaxx-1.3.0-mc26.2.jar`. It added the `/fpsmaxx potato` preset, chunk-update budgeting, removal of far particles, stronger low-end graphics reductions, and the `/fpsmaxx sectionbudget` command.
+- `1.4.0` is the current release. It adds the hidden **FpsMaxx** graphics-preset position, the Sodium Video Settings preset page, automatic **Fresh & Smooth** visual-safe mode, AsyncParticles/Particle Core awareness, and Iris-safe fog handling.
+- The old 1.1.0 label and the old 1.2.0 release are retired. The current `1.4.0` tag points to this source release.
 
 ## Notes
 
@@ -73,5 +74,10 @@ commit the Modrinth token or any API response scratch files.
   and `/fpsmaxx status` on a small-heap instance. The status output should show
   low-end state, particle cull/cap, section budget, and the adaptive particle
   percentage.
+- Open Video Settings and drag the Graphics Preset slider through **FpsMaxx,
+  Fast, Fancy, Fabulous and Custom**. Confirm the FpsMaxx label appears at the
+  far left, the flag persists in `config/fpsmaxx.json`, and vanilla presets reset
+  the mod profile. With Sodium installed, confirm **Video Settings -> FPSMaxx**
+  opens the same slider.
 - If a new version is added, move the previous root/`dist/mods` jar into
   `dist/versions/` and add it to `dist/versions/README.md`.

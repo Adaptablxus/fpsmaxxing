@@ -25,6 +25,12 @@ public abstract class SodiumWorldRendererMixin {
 		require = 0
 	)
 	private FogParameters fpsmaxx$capSodiumFog(FogParameters fog) {
+		// Iris owns the fog when a shader pack is active; leave its parameters
+		// untouched so the pack's atmosphere is preserved.
+		if (FPSMaxxCompat.IRIS) {
+			return fog;
+		}
+
 		FPSMaxxCompat.markSodiumFogHook();
 
 		FPSMaxxConfig config = FPSMaxxConfig.get();

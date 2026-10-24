@@ -3,7 +3,7 @@
 	"id": "fpsmaxx",
 	"version": "${version}",
 	"name": "FPSMaxx",
-	"description": "A low-end-friendly optimization mod for Minecraft 26.2: 64-chunk render distance, adaptive FPS governor, low-end and potato presets, entity/block-entity/particle culling, chunk-update budgeting, memory guard, and Sodium/Iris integration.",
+	"description": "A low-end-friendly optimization mod for Minecraft 26.2: hidden FpsMaxx graphics preset, 64-chunk render distance, adaptive FPS governor, low-end and potato presets, entity/block-entity/particle culling, chunk-update budgeting, memory guard, Fresh & Smooth support, and Sodium/Iris integration.",
 	"authors": [
 		"Rishit"
 	],
@@ -28,6 +28,6 @@
 		"fabric-api": "*"
 	},
 	"suggests": {
-		"sodium": ">=0.9.2"
+		"sodium": ">=0.9.1"
 	}
 }

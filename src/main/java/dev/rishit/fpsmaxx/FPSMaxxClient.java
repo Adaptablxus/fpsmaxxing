@@ -90,5 +90,14 @@ public final class FPSMaxxClient implements ClientModInitializer {
 			FPSMaxxConfig.get().adaptiveMode,
 			FPSMaxxGovernor.effectiveMode()
 		);
+		if (FPSMaxxCompat.FRESH_AND_SMOOTH) {
+			LOGGER.info(
+				"FPSMaxx: Fresh & Smooth detected; visual-safe profile {} (shaders, particles and animations preserved)",
+				FPSMaxxConfig.get().freshSmoothCompatibility ? "enabled" : "disabled (aggressive profile)"
+			);
+		}
+		if (FPSMaxxCompat.ASYNC_PARTICLES || FPSMaxxCompat.PARTICLE_CORE) {
+			LOGGER.info("FPSMaxx: dedicated particle optimizer detected; FPSMaxx particle culling is deferred to it");
+		}
 	}
 }

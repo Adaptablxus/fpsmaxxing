@@ -2,6 +2,7 @@ package dev.rishit.fpsmaxx.mixin;
 
 import dev.rishit.fpsmaxx.FPSMaxxConfig;
 import dev.rishit.fpsmaxx.FPSMaxxGovernor;
+import dev.rishit.fpsmaxx.compat.FPSMaxxCompat;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +23,10 @@ public abstract class GameRendererMixin {
 		index = 1
 	)
 	private int fpsmaxx$fogMatchesVisibleDistance(int vanillaRenderDistance) {
-		if (!FPSMaxxConfig.get().matchFogToVisibleDistance) {
+		// Iris shader packs render their own atmospheric fog. Changing the
+		// vanilla distance underneath them fights the pack and can produce a
+		// visible seam when the governor shrinks the radius.
+		if (FPSMaxxCompat.IRIS || !FPSMaxxConfig.get().matchFogToVisibleDistance) {
 			return vanillaRenderDistance;
 		}
 		return FPSMaxxGovernor.fogDistanceChunks(vanillaRenderDistance);

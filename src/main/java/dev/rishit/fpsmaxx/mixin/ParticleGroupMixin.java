@@ -2,6 +2,7 @@ package dev.rishit.fpsmaxx.mixin;
 
 import dev.rishit.fpsmaxx.FPSMaxxConfig;
 import dev.rishit.fpsmaxx.FPSMaxxGovernor;
+import dev.rishit.fpsmaxx.compat.FPSMaxxCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleGroup;
@@ -22,6 +23,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ParticleGroupMixin {
 	@Inject(method = "tickParticle", at = @At("HEAD"), cancellable = true, require = 1)
 	private void fpsmaxx$removeFarParticle(Particle particle, CallbackInfo ci) {
+		// This hook can run on an AsyncParticles worker thread. Defer to that
+		// mod's own culling instead of reading client state from the wrong thread.
+		if (FPSMaxxCompat.ASYNC_PARTICLES || FPSMaxxCompat.PARTICLE_CORE) {
+			return;
+		}
+
 		FPSMaxxConfig config = FPSMaxxConfig.get();
 		float scale = config.adaptiveParticles ? FPSMaxxGovernor.particleScale() : 1.0F;
 		int cullDistance = config.particleCullDistance <= 0

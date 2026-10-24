@@ -111,9 +111,12 @@ public final class FPSMaxxGovernor {
 
 		// Particle work is a smaller lever than terrain, but it reacts faster
 		// and helps when the CPU is saturated by weather or large farms.
+		// Visual-first packs keep at least 75% of their particles so their
+		// signature effects do not disappear when the FPS dips.
 		if (config.adaptiveParticles) {
+			float floor = config.freshSmoothCompatibility ? 0.75F : 0.5F;
 			if (fps < target - 10) {
-				particleScale = Math.max(0.5F, particleScale - 0.1F);
+				particleScale = Math.max(floor, particleScale - 0.1F);
 			} else if (fps > target + 10) {
 				particleScale = Math.min(1.0F, particleScale + 0.05F);
 			}
@@ -234,8 +237,9 @@ public final class FPSMaxxGovernor {
 	}
 
 	/**
-	 * VSync is a hard cap. With it on, aiming at 65 on a 60 Hz panel would make
-	 * the governor shrink the world forever while the FPS counter never moves.
+	 * VSync and the framerate limit are hard caps. With either one below the
+	 * requested target, aiming at the requested value would make the governor
+	 * shrink the world forever while the FPS counter never moves.
 	 */
 	public static int effectiveTargetFps(Minecraft client, FPSMaxxConfig config) {
 		int target = config.targetFps;
@@ -247,6 +251,11 @@ public final class FPSMaxxGovernor {
 			if (refresh < target) {
 				target = refresh;
 			}
+		}
+
+		int limit = client.options.framerateLimit().get();
+		if (limit > 0 && limit < target) {
+			target = limit;
 		}
 		return Math.max(30, target);
 	}
@@ -341,7 +350,7 @@ public final class FPSMaxxGovernor {
 		int target = effectiveTargetFps(client, config);
 		String targetText = target == config.targetFps
 			? target + " FPS"
-			: target + " FPS (VSync cap; requested " + config.targetFps + ")";
+			: target + " FPS (FPS/VSync cap; requested " + config.targetFps + ")";
 		return "FPSMaxx: adaptive " + (config.adaptiveEnabled ? "ON" : "OFF")
 			+ " | mode " + mode
 			+ " | " + distanceText

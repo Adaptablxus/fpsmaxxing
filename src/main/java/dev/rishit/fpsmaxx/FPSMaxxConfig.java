@@ -3,6 +3,7 @@ package dev.rishit.fpsmaxx;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import dev.rishit.fpsmaxx.compat.FPSMaxxCompat;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,23 @@ public final class FPSMaxxConfig {
 
 	/** Informational flag set by the low-end preset. */
 	public boolean lowEndMode = false;
+
+	/**
+	 * True when the hidden FpsMaxx graphics preset is selected in Video
+	 * Settings. It is deliberately separate from vanilla's
+	 * {@code graphicsPreset} option: FpsMaxx also changes options that vanilla
+	 * presets do not know about, so vanilla reports {@code CUSTOM} while the
+	 * slider must still show FpsMaxx.
+	 */
+	public boolean graphicsPresetFpsMaxx = false;
+
+	/**
+	 * Keep the visual identity of the Fresh &amp; Smooth modpack (shaders,
+	 * particles, animations and resource packs) while still applying the FPSMaxx
+	 * governor, culling and chunk budget. Enabled automatically when the pack is
+	 * detected; set to false to force the full aggressive profile.
+	 */
+	public boolean freshSmoothCompatibility = FPSMaxxCompat.FRESH_AND_SMOOTH;
 
 	public int targetFps = FPSMaxxConstants.DEFAULT_TARGET_FPS;
 
@@ -163,9 +181,37 @@ public final class FPSMaxxConfig {
 		sectionUpdateBudget = FPSMaxxConstants.POTATO_SECTION_UPDATE_BUDGET;
 	}
 
+	/**
+	 * Mod-side defaults for the Fresh &amp; Smooth pack. The pack's shaders,
+	 * particles and animations are left alone; only the distances, culling and
+	 * chunk scheduling are reduced.
+	 */
+	public void applyFreshSmoothDefaults() {
+		lowEndMode = true;
+		targetFps = FPSMaxxConstants.FRESH_SMOOTH_TARGET_FPS;
+		adaptiveEnabled = true;
+		initialVisibleDistance = FPSMaxxConstants.FRESH_SMOOTH_INITIAL_VISIBLE_DISTANCE;
+		minVisibleDistance = FPSMaxxConstants.FRESH_SMOOTH_MIN_VISIBLE_DISTANCE;
+		simulationDistance = FPSMaxxConstants.FRESH_SMOOTH_SIMULATION_DISTANCE;
+		forceSimulationDistance = true;
+		adaptiveMode = "auto";
+		sodiumIntegration = true;
+		sodiumConfigOverlay = true;
+		// Iris shader packs own the fog; matching the visible radius to vanilla
+		// fog would fight the pack's atmospheric look.
+		matchFogToVisibleDistance = false;
+		entityCullDistance = FPSMaxxConstants.FRESH_SMOOTH_ENTITY_CULL_DISTANCE;
+		blockEntityCullDistance = FPSMaxxConstants.FRESH_SMOOTH_BLOCK_ENTITY_CULL_DISTANCE;
+		particleCullDistance = FPSMaxxConstants.FRESH_SMOOTH_PARTICLE_CULL_DISTANCE;
+		maxParticles = FPSMaxxConstants.FRESH_SMOOTH_MAX_PARTICLES;
+		adaptiveParticles = true;
+		sectionUpdateBudget = FPSMaxxConstants.FRESH_SMOOTH_SECTION_UPDATE_BUDGET;
+	}
+
 	/** Mod-side defaults for a normal PC. Vanilla graphics are left untouched. */
 	public void applyBalancedDefaults() {
 		lowEndMode = false;
+		graphicsPresetFpsMaxx = false;
 		targetFps = FPSMaxxConstants.BALANCED_TARGET_FPS;
 		adaptiveEnabled = true;
 		initialVisibleDistance = FPSMaxxConstants.BALANCED_INITIAL_VISIBLE_DISTANCE;

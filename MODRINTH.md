@@ -7,8 +7,29 @@ budgeting, and entity, block-entity and particle culling.
 
 It is not a cheat and does not need to be installed on the server.
 
+## Hidden FpsMaxx graphics preset
+
+Open **Options -> Video Settings** and drag the **Graphics Preset** slider all
+the way to the left. The label changes to **FpsMaxx** and applies the hidden
+profile: the adaptive governor, entity/block-entity/particle culling and the
+chunk-update budget, together with the low-end graphics reductions. The normal
+presets (Fast, Fancy, Fabulous, Custom) still work to the right of it.
+
+Sodium replaces vanilla's Video Settings screen. With Sodium installed, open
+**Video Settings -> FPSMaxx** for the same five-position slider.
+
+## Fresh & Smooth
+
+FPSMaxx detects the **Fresh & Smooth** modpack and automatically uses a
+visual-safe FpsMaxx profile: the pack's shaders, particles, animations and
+resource packs are preserved while distances, culling and chunk scheduling are
+optimized. Use `/fpsmaxx aggressive` to force the full low-end profile.
+
 ## Features
 
+- **Hidden FpsMaxx preset** - the graphics-preset slider gets a fifth position
+  on the far left that applies every FPSMaxx optimization, including culling,
+  particle limits and chunk-update budgeting that vanilla presets cannot reach.
 - **Low-end PC preset** - `/fpsmaxx lowend` applies Fast graphics, clouds off,
   cloud distance 2, minimal particles, weather radius 3, no vignette or improved
   transparency, zero chunk fade, smaller cull distances, render 16, simulation 8,
@@ -25,12 +46,16 @@ It is not a cheat and does not need to be installed on the server.
   the live particle cap shrinks automatically when FPS falls.
 - **Chunk-update budgeting** - caps mesh rebuilds per frame and re-queues the
   rest, smoothing stutter when many sections become dirty at once.
-- **Sodium 0.9.2+ integration** - the same adaptive radius is applied to Sodium's
-  terrain search distance and fog. Sodium's render-distance slider is extended to 64.
-- **Iris-friendly** - works on top of Sodium; shader fog can be left alone.
+- **Sodium 0.9.1+ integration** - the same adaptive radius is applied to Sodium's
+  terrain search distance and fog. Sodium's render-distance slider is extended to 64,
+  and Sodium's Video Settings gets an **FPSMaxx** page with the preset slider.
+- **Iris-friendly** - works on top of Sodium and leaves shader fog alone.
+- **Fresh & Smooth aware** - auto-detected visual-safe profile.
 - **VulkanMod fallback** - switches to a real-render-distance fallback when Sodium's
   culling hook is not available.
 - **Entity and block-entity culling** - distant entities and block entities are skipped.
+- **Particle optimizer aware** - defers particle culling to AsyncParticles or
+  Particle Core when either is installed.
 - **Memory guard** - 2 GB gets 32 chunks, 3 GB gets 48, 4 GB+ gets 64.
 - **F6 toggle** and `/fpsmaxx` commands for live tuning.
 
@@ -47,11 +72,19 @@ or mob-AI optimizer.
   before extraction and submission.
 - **Particle culling and budgeting** - rejects distant particles before they enter
   the tick/render queues, removes particles that drift outside the radius, and
-  caps live particles. The cap falls to 50% when FPS drops, then recovers.
+  caps live particles. The cap falls to 50% when FPS drops (75% on Fresh &
+  Smooth), then recovers.
 - **Chunk-update budgeting** - schedules only the nearest dirty sections each
   frame and re-queues the rest, smoothing the stutter caused by large mesh-rebuild
   bursts. This applies to the vanilla chunk renderer; Sodium manages its own
   chunk builds.
+- **Hidden FpsMaxx preset** - combines the adaptive governor, all three cull
+  distances, the particle budget and the chunk-update budget with the low-end
+  graphics reductions, all from one graphics-preset position.
+- **Fresh & Smooth safe profile** - keeps the pack's shaders, particles,
+  animations and resource packs, but still reduces render/simulation distance,
+  cull distances and chunk scheduling. Particles never drop below 75% of the
+  pack's original budget.
 - **Low-end preset** - applies the vanilla Fast graphics profile plus clouds off,
   cloud distance 2, minimal particles, weather radius 3, no vignette or improved
   transparency, zero chunk fade, no entity shadows/smooth lighting, biome blend 0,
@@ -75,7 +108,7 @@ while keeping the requested chunks loaded.
 
 1. Install **Fabric Loader 0.19.3+** for **Minecraft 26.2** with **Java 25**.
 2. Install **Fabric API 0.161.0+26.2**.
-3. Optional but recommended: install **Sodium 0.9.2+ for 26.2**.
+3. Optional but recommended: install **Sodium 0.9.1+ for 26.2**.
 4. Put the FPSMaxx jar in your `mods` folder. Delete any older FPSMaxx jar first.
 5. Allocate **4 GB or more** of RAM for 64 chunks (6 GB recommended). A 2 GB
    low-end PC can still play with fewer chunks.
@@ -88,8 +121,12 @@ while keeping the requested chunks loaded.
 | Command | Purpose |
 |---|---|
 | `/fpsmaxx status` | Show visible distance, simulation distance, culls, particle budget, section budget, target FPS, and Sodium hook status |
-| `/fpsmaxx lowend` | Apply the complete low-end PC profile |
+| `/fpsmaxx preset` | Open the five-position FpsMaxx graphics-preset screen (works with any renderer) |
+| `/fpsmaxx lowend` | Apply the complete low-end PC profile (Fresh & Smooth safe when detected) |
 | `/fpsmaxx potato` | Apply the extreme low-end profile |
+| `/fpsmaxx freshsmooth` | Apply the visual-safe Fresh & Smooth profile explicitly |
+| `/fpsmaxx aggressive` | Force the full low-end profile even when Fresh & Smooth is detected |
+| `/fpsmaxx visual <true/false>` | Enable/disable the automatic Fresh & Smooth visual-safe profile |
 | `/fpsmaxx balanced` | Restore normal mod-side defaults (vanilla graphics unchanged) |
 | `/fpsmaxx render <2-64>` | Set the requested render distance |
 | `/fpsmaxx mode auto/visible/render` | Choose the adaptive strategy |
@@ -110,12 +147,18 @@ renderer, but chunks load/unload as it moves.
 
 ## Compatibility
 
-- **Sodium 0.9.2+** - tested; adaptive terrain radius, matching fog, and a 64-chunk slider.
-- **Iris** - should work on top of Sodium. If a shader pack supplies its own fog,
-  set `matchFogToVisibleDistance` to `false`.
-- **Lithium / C2ME / FerriteCore / ModernFix / ImmediatelyFast / EntityCulling /
-  Bobby / Nvidium** - optional hooks only; mixins fail safely if another mod
-  changes a target. C2ME's own render-distance uncap takes priority.
+- **Sodium 0.9.1+** - tested; adaptive terrain radius, a 64-chunk slider, and an
+  **FPSMaxx** page in Sodium's Video Settings.
+- **Iris** - tested with Iris 1.11.2. FPSMaxx leaves shader fog alone, so the
+  pack's atmosphere is preserved.
+- **Fresh & Smooth** - tested with the 26.2 release. Auto-detected; the FpsMaxx
+  preset uses a visual-safe profile. Use `/fpsmaxx aggressive` to override it.
+- **AsyncParticles / Particle Core** - FPSMaxx defers particle culling to these
+  mods to avoid duplicate work and thread-safety issues.
+- **Lithium / C2ME / ServerCore / VMP / FerriteCore / ModernFix /
+  ImmediatelyFast / EntityCulling / MoreCulling / BadOptimizations / Bobby /
+  Nvidium** - optional hooks only; mixins fail safely if another mod changes a
+  target. C2ME's own render-distance uncap takes priority.
 - **Resource packs** - textures, models, UI, sounds and language files are not
   touched. Resource packs with custom fog can win with
   `matchFogToVisibleDistance: false`.
@@ -132,9 +175,10 @@ If Sodium integration reports `no-hook` in `/fpsmaxx status`, use
   cannot force a server to send more chunks.
 - **Simulation distance 32 is CPU-heavy.** Use `/fpsmaxx lowend` (simulation 8)
   or `/fpsmaxx potato` (simulation 5) on weak hardware.
-- **The low-end and potato presets change vanilla graphics options.** They do not
-  restore them; use Video Settings or `/fpsmaxx balanced` (which only resets
-  FPSMaxx settings) if you want a different balance.
+- **The FpsMaxx, low-end and potato presets change vanilla graphics options.**
+  They do not restore them; use Video Settings or `/fpsmaxx balanced` (which only
+  resets FPSMaxx settings) if you want a different balance. The FpsMaxx preset
+  leaves vanilla reporting `Custom` because the enum has no FpsMaxx value.
 - **A section budget can delay newly loaded chunks.** Lower it for smoother frame
   times or set it to 0 for vanilla behavior.
 - 64 chunks is roughly 18,000 loaded chunks on both client and integrated server;

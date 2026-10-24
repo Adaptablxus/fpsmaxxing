@@ -44,6 +44,22 @@ public final class FPSMaxxConstants {
 	public static final int POTATO_RENDER_DISTANCE = 8;
 	public static final int POTATO_SECTION_UPDATE_BUDGET = 24;
 
+	/**
+	 * Visual-safe profile for the Fresh &amp; Smooth modpack. It keeps shaders,
+	 * particles and animations intact while lowering the expensive distances and
+	 * scheduling costs.
+	 */
+	public static final int FRESH_SMOOTH_TARGET_FPS = 60;
+	public static final int FRESH_SMOOTH_INITIAL_VISIBLE_DISTANCE = 16;
+	public static final int FRESH_SMOOTH_MIN_VISIBLE_DISTANCE = 6;
+	public static final int FRESH_SMOOTH_SIMULATION_DISTANCE = 8;
+	public static final int FRESH_SMOOTH_ENTITY_CULL_DISTANCE = 96;
+	public static final int FRESH_SMOOTH_BLOCK_ENTITY_CULL_DISTANCE = 96;
+	public static final int FRESH_SMOOTH_PARTICLE_CULL_DISTANCE = 64;
+	public static final int FRESH_SMOOTH_MAX_PARTICLES = 4000;
+	public static final int FRESH_SMOOTH_RENDER_DISTANCE = 16;
+	public static final int FRESH_SMOOTH_SECTION_UPDATE_BUDGET = 64;
+
 	/** Balanced preset values for normal PCs. */
 	public static final int BALANCED_TARGET_FPS = 65;
 	public static final int BALANCED_INITIAL_VISIBLE_DISTANCE = 32;

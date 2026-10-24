@@ -26,6 +26,27 @@ public final class FPSMaxxCompat {
 	public static final boolean MODERNFIX = isLoaded("modernfix");
 	public static final boolean BOBBY = isLoaded("bobby");
 	public static final boolean NVIDIUM = isLoaded("nvidium");
+	public static final boolean ASYNC_PARTICLES = isLoaded("asyncparticles");
+	public static final boolean PARTICLE_CORE = isLoaded("particle_core");
+	public static final boolean MORE_CULLING = isLoaded("moreculling");
+	public static final boolean BAD_OPTIMIZATIONS = isLoaded("badoptimizations");
+	public static final boolean SODIUM_EXTRA = isLoaded("sodium-extra");
+	public static final boolean SERVER_CORE = isLoaded("servercore");
+
+	/**
+	 * Fresh &amp; Smooth is a visual-first client pack built around shaders,
+	 * animations and a large set of particle mods. Detecting the combination
+	 * (rather than a single mod) avoids matching unrelated packs that happen to
+	 * include one of them.
+	 */
+	public static final boolean FRESH_AND_SMOOTH =
+		isLoaded("particlerain")
+			&& isLoaded("particular")
+			&& isLoaded("wakes")
+			&& isLoaded("visuality")
+			&& isLoaded("bettersmoke")
+			&& isLoaded("do_a_barrel_roll")
+			&& isLoaded("notenoughanimations");
 
 	private static boolean sodiumTerrainHook;
 	private static boolean sodiumFogHook;
@@ -106,6 +127,14 @@ public final class FPSMaxxCompat {
 		append(builder, "ModernFix", MODERNFIX);
 		append(builder, "Bobby", BOBBY);
 		append(builder, "Nvidium", NVIDIUM);
+		append(builder, "AsyncParticles", ASYNC_PARTICLES);
+		append(builder, "MoreCulling", MORE_CULLING);
+		append(builder, "BadOptimizations", BAD_OPTIMIZATIONS);
+		append(builder, "Sodium Extra", SODIUM_EXTRA);
+		append(builder, "ServerCore", SERVER_CORE);
+		if (FRESH_AND_SMOOTH) {
+			append(builder, "Fresh & Smooth profile", true);
+		}
 		return builder.length() == 0 ? "no known optimization mods" : builder.toString();
 	}
 

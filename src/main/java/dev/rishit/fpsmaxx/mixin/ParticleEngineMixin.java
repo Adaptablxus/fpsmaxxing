@@ -2,6 +2,7 @@ package dev.rishit.fpsmaxx.mixin;
 
 import dev.rishit.fpsmaxx.FPSMaxxConfig;
 import dev.rishit.fpsmaxx.FPSMaxxGovernor;
+import dev.rishit.fpsmaxx.compat.FPSMaxxCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleEngine;
@@ -34,6 +35,13 @@ public abstract class ParticleEngineMixin {
 
 	@Inject(method = "add", at = @At("HEAD"), cancellable = true)
 	private void fpsmaxx$limitParticles(Particle particle, CallbackInfo ci) {
+		// AsyncParticles and Particle Core own the particle pipeline. Duplicating
+		// their culling from here would fight their configuration and, in the
+		// async case, touch particle state off the render thread.
+		if (FPSMaxxCompat.ASYNC_PARTICLES || FPSMaxxCompat.PARTICLE_CORE) {
+			return;
+		}
+
 		FPSMaxxConfig config = FPSMaxxConfig.get();
 		Minecraft client = Minecraft.getInstance();
 		Entity camera = client.getCameraEntity();

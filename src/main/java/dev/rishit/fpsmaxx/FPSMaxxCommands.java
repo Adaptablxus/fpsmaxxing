@@ -28,6 +28,11 @@ public final class FPSMaxxCommands {
 					sendStatus(ctx.getSource());
 					return 1;
 				}))
+				.then(ClientCommands.literal("preset").executes(ctx -> {
+					Minecraft client = ctx.getSource().getClient();
+					client.setScreenAndShow(new FPSMaxxPresetScreen(null));
+					return 1;
+				}))
 				.then(ClientCommands.literal("adaptive")
 					.then(ClientCommands.argument("enabled", BoolArgumentType.bool()).executes(ctx -> {
 						FPSMaxxConfig config = FPSMaxxConfig.get();
@@ -155,6 +160,30 @@ public final class FPSMaxxCommands {
 					).withStyle(ChatFormatting.GREEN));
 					return 1;
 				}))
+				.then(ClientCommands.literal("freshsmooth").executes(ctx -> {
+					ctx.getSource().sendFeedback(Component.literal(
+						FPSMaxxPresets.applyFreshSmooth(ctx.getSource().getClient(), null)
+					).withStyle(ChatFormatting.GREEN));
+					return 1;
+				}))
+				.then(ClientCommands.literal("aggressive").executes(ctx -> {
+					ctx.getSource().sendFeedback(Component.literal(
+						FPSMaxxPresets.applyAggressiveLowEnd(ctx.getSource().getClient())
+					).withStyle(ChatFormatting.GREEN));
+					return 1;
+				}))
+				.then(ClientCommands.literal("visual")
+					.then(ClientCommands.argument("enabled", BoolArgumentType.bool()).executes(ctx -> {
+						FPSMaxxConfig config = FPSMaxxConfig.get();
+						config.freshSmoothCompatibility = BoolArgumentType.getBool(ctx, "enabled");
+						config.save();
+						ctx.getSource().sendFeedback(Component.literal(
+							"FPSMaxx Fresh & Smooth compatibility "
+								+ (config.freshSmoothCompatibility ? "enabled" : "disabled")
+								+ " (detected: " + (FPSMaxxCompat.FRESH_AND_SMOOTH ? "yes" : "no") + ")"
+						).withStyle(ChatFormatting.GREEN));
+						return 1;
+					})))
 				.then(ClientCommands.literal("sectionbudget")
 					.then(ClientCommands.argument("sections", IntegerArgumentType.integer(0, 512)).executes(ctx -> {
 						FPSMaxxConfig config = FPSMaxxConfig.get();
@@ -208,17 +237,24 @@ public final class FPSMaxxCommands {
 		source.sendFeedback(Component.literal(
 			"mode " + FPSMaxxGovernor.effectiveMode()
 				+ " | low-end " + (config.lowEndMode ? "on" : "off")
+				+ " | profile " + (FPSMaxxPresets.useFreshSmoothProfile()
+					? "Fresh & Smooth safe"
+					: config.lowEndMode ? "aggressive" : "balanced")
+				+ " | graphics " + (config.graphicsPresetFpsMaxx
+					? "FpsMaxx"
+					: source.getClient().options.graphicsPreset().get().getSerializedName())
 				+ " | max slider " + FPSMaxxConstants.MAX_RENDER_DISTANCE
 				+ " | min " + config.minVisibleDistance
 				+ " | sim " + config.simulationDistance
 				+ (config.forceSimulationDistance ? " (forced)" : " (manual)")
 				+ " | entity cull " + config.entityCullDistance
 				+ " | block entity cull " + config.blockEntityCullDistance
-				+ " | particles " + config.particleCullDistance + " blocks / "
-				+ config.maxParticles + " cap"
-				+ (config.adaptiveParticles
-					? " (" + Math.round(FPSMaxxGovernor.particleScale() * 100.0F) + "%)"
-					: "")
+				+ " | particles " + (FPSMaxxCompat.ASYNC_PARTICLES
+					? "AsyncParticles"
+					: config.particleCullDistance + " blocks / " + config.maxParticles + " cap"
+						+ (config.adaptiveParticles
+							? " (" + Math.round(FPSMaxxGovernor.particleScale() * 100.0F) + "%)"
+							: ""))
 				+ " | section budget " + config.sectionUpdateBudget
 				+ (config.sectionUpdateBudget > 0
 					? " (now " + FPSMaxxGovernor.sectionUpdateBudget() + ")"
