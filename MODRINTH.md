@@ -1,9 +1,10 @@
 # FPSMaxx
 
 FPSMaxx is a **client-side Fabric optimization mod for Minecraft 26.2** built
-for **smooth gameplay on low-end PCs**. It combines a 64-chunk render-distance
-unlock with an adaptive FPS governor, low-end and potato profiles, chunk-update
-budgeting, and entity, block-entity and particle culling.
+for **smooth gameplay on low-end PCs**. It combines a hidden **FpsMaxx** graphics
+preset, a 64-chunk render-distance unlock, an adaptive FPS governor, low-end and
+potato profiles, chunk-update budgeting, entity/block-entity/particle culling,
+Fresh &amp; Smooth support, and Sodium/Iris integration.
 
 It is not a cheat and does not need to be installed on the server.
 
@@ -49,7 +50,8 @@ optimized. Use `/fpsmaxx aggressive` to force the full low-end profile.
   rest, smoothing stutter when many sections become dirty at once.
 - **Sodium 0.9.1+ integration** - the same adaptive radius is applied to Sodium's
   terrain search distance and fog. Sodium's render-distance slider is extended to 64,
-  and Sodium's Video Settings gets an **FPSMaxx** page with the preset slider.
+  and Sodium's Video Settings gets a searchable **FPSMaxx** page with an
+  **Open FPSMaxx preset screen** button.
 - **Iris-friendly** - works on top of Sodium and leaves shader fog alone.
 - **Fresh & Smooth aware** - auto-detected visual-safe profile.
 - **VulkanMod fallback** - switches to a real-render-distance fallback when Sodium's

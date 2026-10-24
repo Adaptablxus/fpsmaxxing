@@ -42,7 +42,9 @@ Project ID: `kA3JYFQu`
 
 Use `MODRINTH.md` as the project body and `modrinth-icon.png` as the icon. The
 release workflow uploads the same `FPSMaxx-<version>-mc26.2.jar` automatically.
-If uploading manually, use:
+To update the live project summary and body, run the **Update Modrinth metadata**
+workflow from the Actions tab; it uses `scripts/update-modrinth-metadata.sh` and
+the same `MODRINTH_TOKEN` secret. If uploading manually, use:
 
 - Game version: `26.2`
 - Loader: `fabric`
