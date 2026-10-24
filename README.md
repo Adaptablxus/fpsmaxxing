@@ -7,7 +7,7 @@ visibility governor, and cuts the work that usually causes stutter: distant
 entities, block entities, particles, unnecessary chunk sections, oversized
 graphics settings and bursty chunk-mesh rebuilds. It also adds a hidden
 **FpsMaxx** graphics-preset position that applies every optimization at once,
-plus a visual-safe profile for the **Fresh &amp; Smooth** modpack. Install it on
+plus a visual-safe profile for the **Fresh & Smooth** modpack. Install it on
 the client, not on the server.
 
 On a weak PC, run **`/fpsmaxx lowend`** once. It applies a complete low-end

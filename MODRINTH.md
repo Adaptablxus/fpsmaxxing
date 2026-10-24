@@ -4,7 +4,7 @@ FPSMaxx is a **client-side Fabric optimization mod for Minecraft 26.2** built
 for **smooth gameplay on low-end PCs**. It combines a hidden **FpsMaxx** graphics
 preset, a 64-chunk render-distance unlock, an adaptive FPS governor, low-end and
 potato profiles, chunk-update budgeting, entity/block-entity/particle culling,
-Fresh &amp; Smooth support, and Sodium/Iris integration.
+Fresh & Smooth support, and Sodium/Iris integration.
 
 It is not a cheat and does not need to be installed on the server.
 
