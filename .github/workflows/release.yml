@@ -24,11 +24,17 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build
+      - name: Build Fabric jar
+        run: ./gradlew build --no-daemon
+
+      - name: Build NeoForge jar
+        run: ./gradlew -p neoforge-probe build --no-daemon
+
+      - name: Prepare release jars
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          ./gradlew build --no-daemon
-          cp "build/libs/fpsmaxx-${VERSION}.jar" "FPSMaxx-${VERSION}-mc26.2.jar"
+          cp "build/libs/fpsmaxx-${VERSION}.jar" "FPSMaxx-${VERSION}-fabric-mc26.3.jar"
+          cp "neoforge-probe/build/libs/fpsmaxx-neoforge-${VERSION}.jar" "FPSMaxx-${VERSION}-neoforge-mc26.3.jar"
           echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
 
       - name: Create GitHub release
@@ -38,9 +44,18 @@ jobs:
           cat > release-notes.md <<EOF
           ## FPSMaxx ${VERSION}
 
-          FPSMaxx is a **client-side Fabric optimization mod for Minecraft 26.2**,
-          built for smooth gameplay on low-end PCs. It unlocks a 64-chunk render
-          distance and uses an adaptive visible-radius governor to protect frame rate.
+          FPSMaxx is a **client-side optimization mod for Minecraft 26.3** with
+          **Fabric** and **NeoForge** builds. It is built for smooth gameplay on
+          low-end PCs while keeping high-end machines fast.
+
+          ### Choose your jar
+
+          - **Fabric 26.3:** \`FPSMaxx-${VERSION}-fabric-mc26.3.jar\`
+          - **NeoForge 26.3:** \`FPSMaxx-${VERSION}-neoforge-mc26.3.jar\`
+          - **Fabric 26.2:** use the previous \`1.4.1\` release.
+
+          Fabric users also need **Fabric API 0.165.0+26.3** (or newer for 26.3).
+          NeoForge users need **NeoForge 26.3.0.97+**. Java 25 is required.
 
           ### How it optimizes
 
@@ -73,6 +88,14 @@ jobs:
             they can safely hold.
           - **Chunk retention** - visible mode avoids repeated load/unload stutter.
 
+          ### Loader notes
+
+          - **Fabric:** Sodium 0.9.2+ for 26.3 works. The jar also runs on Quilt.
+          - **NeoForge:** use **Sodium NeoForge 0.9.3-beta.1+** for 26.3. Sodium
+            NeoForge 0.9.2 has a broken \`LevelExtractor\` mixin on 26.3.
+          - **PojavLauncher / MojoLauncher:** use the Fabric jar. NeoForge is not
+            supported by most mobile launchers yet.
+
           It is a rendering optimization mod, not a mob-AI or server optimizer.
           Simulation distance 32 is CPU-heavy; low-end lowers it to 8 and potato
           lowers it to 5.
@@ -81,11 +104,16 @@ jobs:
           **Modrinth:** https://modrinth.com/mod/fpsmaxx
           EOF
           gh release create "$GITHUB_REF_NAME" \
-            "FPSMaxx-${VERSION}-mc26.2.jar" \
+            "FPSMaxx-${VERSION}-fabric-mc26.3.jar" \
+            "FPSMaxx-${VERSION}-neoforge-mc26.3.jar" \
             --title "FPSMaxx ${VERSION}" \
             --notes-file release-notes.md
 
+      # The Modrinth project is still under review, so this step is allowed to
+      # fail without blocking the GitHub release. Once approved, remove
+      # continue-on-error to make Modrinth publication mandatory.
       - name: Publish to Modrinth
+        continue-on-error: true
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           VERSION: ${{ env.VERSION }}

@@ -1,8 +1,8 @@
 # FPSMaxx NeoForge 26.3 probe
 
-This is the loader experiment for FPSMaxx. It compiles the shared FPSMaxx core
-against NeoForge 26.3 and adds the NeoForge-specific entrypoint, command tree,
-and Sodium config page. The published Fabric 26.2 build is untouched.
+This is the NeoForge build for FPSMaxx 1.5.0. It compiles the shared FPSMaxx
+core against NeoForge 26.3 and adds the NeoForge-specific entrypoint, command
+tree, and Sodium config page. The Fabric 26.3 build is in the repository root.
 
 ## Build
 
@@ -10,7 +10,7 @@ and Sodium config page. The published Fabric 26.2 build is untouched.
 .\gradlew -p neoforge-probe build
 ```
 
-Output: `neoforge-probe/build/libs/fpsmaxx-neoforge-1.4.1.jar`
+Output: `neoforge-probe/build/libs/fpsmaxx-neoforge-1.5.0.jar`
 
 ## Run
 

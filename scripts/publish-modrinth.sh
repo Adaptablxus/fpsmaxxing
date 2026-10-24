@@ -5,18 +5,28 @@ set -euo pipefail
 : "${MODRINTH_TOKEN:?MODRINTH_TOKEN is required}"
 
 PROJECT_ID="kA3JYFQu"
-JAR_PATH="FPSMaxx-${VERSION}-mc26.2.jar"
-VERSION_DATA="version-data.json"
+FABRIC_JAR="FPSMaxx-${VERSION}-fabric-mc26.3.jar"
+NEOFORGE_JAR="FPSMaxx-${VERSION}-neoforge-mc26.3.jar"
 
-if [[ ! -f "${JAR_PATH}" ]]; then
-  echo "Missing ${JAR_PATH}" >&2
-  exit 1
+for jar in "${FABRIC_JAR}" "${NEOFORGE_JAR}"; do
+  if [[ ! -f "${jar}" ]]; then
+    echo "Missing ${jar}" >&2
+    exit 1
+  fi
+done
+
+# The project is still under review. While that is true the public API returns
+# 404 even with a valid token, so skip cleanly instead of failing the release.
+PROJECT_STATUS=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+  "https://api.modrinth.com/v2/project/${PROJECT_ID}" \
+  -H "Authorization: Bearer ${MODRINTH_TOKEN}" \
+  -H "User-Agent: FPSMaxx-release-workflow")
+if [[ "${PROJECT_STATUS}" == "404" ]]; then
+  echo "Modrinth project ${PROJECT_ID} is not publicly available yet; skipping upload."
+  exit 0
 fi
 
-jq -n \
-  --arg name "FPSMaxx ${VERSION}" \
-  --arg version "${VERSION}" \
-  --arg changelog "FPSMaxx ${VERSION} is a client-side Fabric optimization mod for Minecraft 26.2, built for smooth gameplay on low-end PCs.
+CHANGELOG="FPSMaxx ${VERSION} adds Fabric and NeoForge builds for Minecraft 26.3.
 
 How it optimizes:
 - Hidden FpsMaxx preset: drag the Graphics Preset slider all the way left. The FpsMaxx position applies the adaptive governor, all cull distances, the particle budget and the chunk-update budget together with the low-end graphics reductions.
@@ -32,32 +42,72 @@ How it optimizes:
 - Memory guard: prevents small heaps from loading more chunks than they can safely hold.
 - Chunk retention: visible mode avoids repeated load/unload stutter.
 
-It is a rendering optimization mod, not a mob-AI or server optimizer. Simulation distance 32 is CPU-heavy; low-end lowers it to 8 and potato lowers it to 5.
+Loader notes:
+- Fabric: Sodium 0.9.2+ for 26.3 works. The jar also runs on Quilt.
+- NeoForge: use Sodium NeoForge 0.9.3-beta.1+ for 26.3. Sodium NeoForge 0.9.2 has a broken LevelExtractor mixin on 26.3.
 
-Full notes: https://github.com/Adaptablxus/fpsmaxxing/releases/tag/v${VERSION}" \
-  --arg project_id "${PROJECT_ID}" \
-  '{
-    name: $name,
-    version_number: $version,
-    changelog: $changelog,
-    dependencies: [
-      { project_id: "P7dR8mSH", dependency_type: "required" },
-      { project_id: "AANobbMI", dependency_type: "optional" }
-    ],
-    game_versions: ["26.2"],
-    version_type: "release",
-    loaders: ["fabric"],
-    featured: false,
-    status: "listed",
-    project_id: $project_id,
-    file_parts: ["file"],
-    primary_file: "file",
-    environment: "client_only"
-  }' > "${VERSION_DATA}"
+Full notes: https://github.com/Adaptablxus/fpsmaxxing/releases/tag/v${VERSION}"
 
-curl --fail-with-body --retry 3 --retry-delay 2 \
-  -X POST "https://api.modrinth.com/v2/version" \
-  -H "Authorization: Bearer ${MODRINTH_TOKEN}" \
-  -H "User-Agent: FPSMaxx-release-workflow" \
-  -F "data=<${VERSION_DATA};type=application/json" \
-  -F "file=@${JAR_PATH};type=application/java-archive"
+upload_version() {
+  local loader="$1"
+  local jar="$2"
+  local name="$3"
+  local version_number="$4"
+  local dependencies="$5"
+  local data="version-${loader}.json"
+  local response="version-${loader}-response.json"
+
+  jq -n \
+    --arg name "${name}" \
+    --arg version_number "${version_number}" \
+    --arg changelog "${CHANGELOG}" \
+    --arg project_id "${PROJECT_ID}" \
+    --argjson dependencies "${dependencies}" \
+    --arg loader "${loader}" \
+    '{
+      name: $name,
+      version_number: $version_number,
+      changelog: $changelog,
+      dependencies: $dependencies,
+      game_versions: ["26.3"],
+      version_type: "release",
+      loaders: [$loader],
+      featured: false,
+      status: "listed",
+      project_id: $project_id,
+      file_parts: ["file"],
+      primary_file: "file",
+      environment: "client_only"
+    }' > "${data}"
+
+  local http_code
+  http_code=$(curl --silent --show-error --retry 3 --retry-delay 2 \
+    --output "${response}" --write-out '%{http_code}' \
+    -X POST "https://api.modrinth.com/v2/version" \
+    -H "Authorization: Bearer ${MODRINTH_TOKEN}" \
+    -H "User-Agent: FPSMaxx-release-workflow" \
+    -F "data=<${data};type=application/json" \
+    -F "file=@${jar};type=application/java-archive")
+
+  if [[ "${http_code}" != 2* ]]; then
+    echo "Modrinth upload failed for ${loader} (HTTP ${http_code}):" >&2
+    cat "${response}" >&2
+    exit 1
+  fi
+
+  echo "Uploaded ${jar} to Modrinth as ${version_number}."
+}
+
+upload_version \
+  "fabric" \
+  "${FABRIC_JAR}" \
+  "FPSMaxx ${VERSION} (Fabric 26.3)" \
+  "${VERSION}-fabric" \
+  '[{"project_id":"P7dR8mSH","dependency_type":"required"},{"project_id":"AANobbMI","dependency_type":"optional"}]'
+
+upload_version \
+  "neoforge" \
+  "${NEOFORGE_JAR}" \
+  "FPSMaxx ${VERSION} (NeoForge 26.3)" \
+  "${VERSION}-neoforge" \
+  '[{"project_id":"AANobbMI","dependency_type":"optional"}]'

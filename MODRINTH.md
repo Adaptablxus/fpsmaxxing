@@ -1,12 +1,25 @@
 # FPSMaxx
 
-FPSMaxx is a **client-side Fabric optimization mod for Minecraft 26.2** built
-for **smooth gameplay on low-end PCs**. It combines a hidden **FpsMaxx** graphics
-preset, a 64-chunk render-distance unlock, an adaptive FPS governor, low-end and
-potato profiles, chunk-update budgeting, entity/block-entity/particle culling,
-Fresh & Smooth support, and Sodium/Iris integration.
+FPSMaxx is a **client-side Fabric and NeoForge optimization mod for Minecraft
+26.3** built for **smooth gameplay on low-end PCs**. It combines a hidden
+**FpsMaxx** graphics preset, a 64-chunk render-distance unlock, an adaptive FPS
+governor, low-end and potato profiles, chunk-update budgeting,
+entity/block-entity/particle culling, Fresh & Smooth support, and Sodium/Iris
+integration.
 
 It is not a cheat and does not need to be installed on the server.
+
+## Choose your build
+
+| Loader | Minecraft | Jar |
+|---|---|---|
+| Fabric | 26.3 | `FPSMaxx-1.5.0-fabric-mc26.3.jar` |
+| NeoForge | 26.3 | `FPSMaxx-1.5.0-neoforge-mc26.3.jar` |
+| Fabric | 26.2 | `FPSMaxx-1.4.1-mc26.2.jar` (previous release) |
+
+Fabric users also need **Fabric API 0.165.0+26.3**. NeoForge users need
+**NeoForge 26.3.0.97+**. Both require **Java 25**. The Fabric jar also runs on
+Quilt.
 
 ## Hidden FpsMaxx graphics preset
 
@@ -48,10 +61,11 @@ optimized. Use `/fpsmaxx aggressive` to force the full low-end profile.
   the live particle cap shrinks automatically when FPS falls.
 - **Chunk-update budgeting** - caps mesh rebuilds per frame and re-queues the
   rest, smoothing stutter when many sections become dirty at once.
-- **Sodium 0.9.1+ integration** - the same adaptive radius is applied to Sodium's
+- **Sodium integration** - the same adaptive radius is applied to Sodium's
   terrain search distance and fog. Sodium's render-distance slider is extended to 64,
   and Sodium's Video Settings gets a searchable **FPSMaxx** page with an
-  **Open FPSMaxx preset screen** button.
+  **Open FPSMaxx preset screen** button. Fabric uses Sodium 0.9.2+ for 26.3;
+  NeoForge needs Sodium NeoForge 0.9.3-beta.1+ for 26.3.
 - **Iris-friendly** - works on top of Sodium and leaves shader fog alone.
 - **Fresh & Smooth aware** - auto-detected visual-safe profile.
 - **VulkanMod fallback** - switches to a real-render-distance fallback when Sodium's
@@ -107,17 +121,28 @@ Simulation distance 32 is CPU-heavy; `/fpsmaxx lowend` lowers it to 8 and
 `/fpsmaxx potato` to 5. The governor trades visible draw distance for frame rate
 while keeping the requested chunks loaded.
 
-## Install
+## Install — Fabric
 
-1. Install **Fabric Loader 0.19.3+** for **Minecraft 26.2** with **Java 25**.
-2. Install **Fabric API 0.161.0+26.2**.
-3. Optional but recommended: install **Sodium 0.9.1+ for 26.2**.
-4. Put the FPSMaxx jar in your `mods` folder. Delete any older FPSMaxx jar first.
+1. Install **Fabric Loader 0.20.1+** for **Minecraft 26.3** with **Java 25**.
+2. Install **Fabric API 0.165.0+26.3**.
+3. Optional but recommended: install **Sodium 0.9.2+ for 26.3**.
+4. Put `FPSMaxx-1.5.0-fabric-mc26.3.jar` in your `mods` folder. Delete any older
+   FPSMaxx jar first.
 5. Allocate **4 GB or more** of RAM for 64 chunks (6 GB recommended). A 2 GB
    low-end PC can still play with fewer chunks.
 6. On a low-end PC, run `/fpsmaxx lowend`; if that is still not smooth, run
    `/fpsmaxx potato`. Otherwise set **Render Distance** to 64; simulation
    distance is applied automatically.
+
+## Install — NeoForge
+
+1. Install **NeoForge 26.3.0.97+** for **Minecraft 26.3** with **Java 25**.
+2. Put `FPSMaxx-1.5.0-neoforge-mc26.3.jar` in your `mods` folder. Fabric API is
+   not needed on NeoForge.
+3. Optional but recommended: install **Sodium NeoForge 0.9.3-beta.1+ for 26.3**.
+   Sodium NeoForge 0.9.2 has a broken `LevelExtractor` mixin on 26.3.
+4. The commands, keybind, presets and `config/fpsmaxx.json` are the same as the
+   Fabric build.
 
 ## Commands
 
@@ -150,11 +175,12 @@ renderer, but chunks load/unload as it moves.
 
 ## Compatibility
 
-- **Sodium 0.9.1+** - tested; adaptive terrain radius, a 64-chunk slider, and an
-  **FPSMaxx** page in Sodium's Video Settings.
+- **Sodium** - Fabric 0.9.2+ for 26.3 and NeoForge 0.9.3-beta.1+ for 26.3;
+  adaptive terrain radius, a 64-chunk slider, and an **FPSMaxx** page in
+  Sodium's Video Settings.
 - **Iris** - tested with Iris 1.11.2. FPSMaxx leaves shader fog alone, so the
   pack's atmosphere is preserved.
-- **Fresh & Smooth** - tested with the 26.2 release. Auto-detected; the FpsMaxx
+- **Fresh & Smooth** - tested with the 26.3 release. Auto-detected; the FpsMaxx
   preset uses a visual-safe profile. Use `/fpsmaxx aggressive` to override it.
 - **AsyncParticles / Particle Core** - FPSMaxx defers particle culling to these
   mods to avoid duplicate work and thread-safety issues.

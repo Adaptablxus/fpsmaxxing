@@ -1,7 +1,8 @@
-# FPSMaxx (Minecraft 26.2 / Fabric)
+# FPSMaxx (Minecraft 26.3 / Fabric + NeoForge)
 
-FPSMaxx is a **client-side Fabric optimization mod for Minecraft 26.2**, built
-for **smooth gameplay on low-end PCs** as well as high-end machines. It raises
+FPSMaxx is a **client-side Fabric and NeoForge optimization mod for Minecraft
+26.3**, built for **smooth gameplay on low-end PCs** as well as high-end
+machines. It raises
 the render-distance slider from 32 to **64 chunks**, adds an adaptive
 visibility governor, and cuts the work that usually causes stutter: distant
 entities, block entities, particles, unnecessary chunk sections, oversized
@@ -9,6 +10,18 @@ graphics settings and bursty chunk-mesh rebuilds. It also adds a hidden
 **FpsMaxx** graphics-preset position that applies every optimization at once,
 plus a visual-safe profile for the **Fresh & Smooth** modpack. Install it on
 the client, not on the server.
+
+### Choose your build
+
+| Loader | Minecraft | Jar |
+|---|---|---|
+| Fabric | 26.3 | `FPSMaxx-1.5.0-fabric-mc26.3.jar` |
+| NeoForge | 26.3 | `FPSMaxx-1.5.0-neoforge-mc26.3.jar` |
+| Fabric | 26.2 | `FPSMaxx-1.4.1-mc26.2.jar` (previous release) |
+
+Fabric users also need **Fabric API 0.165.0+26.3**. NeoForge users need
+**NeoForge 26.3.0.97+**. Both builds require **Java 25**. The Fabric jar also
+runs on Quilt; the NeoForge jar is for NeoForge.
 
 On a weak PC, run **`/fpsmaxx lowend`** once. It applies a complete low-end
 profile: Fast graphics, clouds off, fewer particles, no entity shadows or
@@ -72,14 +85,17 @@ Modrinth: <https://modrinth.com/mod/fpsmaxx>
 
 | Thing | Version |
 |---|---|
-| Minecraft Java Edition | **26.2** |
-| Fabric Loader | **0.19.3 or newer** |
-| Fabric API | **0.161.0+26.2** (any 26.2 build works) |
-| Java | **25** (required by 26.2) |
+| Minecraft Java Edition | **26.3** |
+| Fabric Loader (Fabric build) | **0.20.1 or newer** |
+| Fabric API (Fabric build) | **0.165.0+26.3** (any 26.3 build works) |
+| NeoForge (NeoForge build) | **26.3.0.97 or newer** |
+| Java | **25** (required by 26.3) |
 | RAM | **4 GB+ allocated** for 64 chunks (6 GB recommended) |
 | CPU | 32 simulation distance is CPU-heavy; use `/fpsmaxx lowend` on weak PCs |
-| Sodium (optional) | **0.9.1+ for 26.2** (recommended) |
-| Mod | `FPSMaxx-1.4.1-mc26.2.jar` |
+| Sodium (optional, Fabric) | **0.9.2+ for 26.3** (recommended) |
+| Sodium (optional, NeoForge) | **0.9.3-beta.1+ for 26.3** (0.9.2 has a broken 26.3 mixin) |
+| Fabric jar | `FPSMaxx-1.5.0-fabric-mc26.3.jar` |
+| NeoForge jar | `FPSMaxx-1.5.0-neoforge-mc26.3.jar` |
 
 ## Low-end PC quick start
 
@@ -127,13 +143,13 @@ heap) start with the mod-side low-end defaults automatically, but the command is
 what applies the vanilla graphics reductions. You can force the first-run choice
 with `-Dfpsmaxx.forceLowEnd=true` or `-Dfpsmaxx.forceBalanced=true`.
 
-## Install — PC (official launcher / Prism / MultiMC)
+## Install — Fabric (PC: official launcher / Prism / MultiMC)
 
-1. Install Fabric Loader 0.19.3+ for Minecraft 26.2.
+1. Install Fabric Loader 0.20.1+ for Minecraft 26.3.
 2. Put these two files in the instance's `mods` folder (both are in `dist/mods/`):
-   - `FPSMaxx-1.4.1-mc26.2.jar`
-   - `fabric-api-0.161.0+26.2.jar`
-3. If you use **Sodium**, install **Sodium 0.9.1+ for 26.2** as well. FPSMaxx
+   - `FPSMaxx-1.5.0-fabric-mc26.3.jar`
+   - `fabric-api-0.165.0+26.3.jar`
+3. If you use **Sodium**, install **Sodium 0.9.2+ for 26.3** as well. FPSMaxx
    detects it automatically, applies the same adaptive radius to Sodium's
    terrain and fog, and extends Sodium's render-distance slider to 64.
 4. Allocate **4 GB or more** to the instance for 64 chunks (6 GB recommended).
@@ -149,15 +165,28 @@ with `-Dfpsmaxx.forceLowEnd=true` or `-Dfpsmaxx.forceBalanced=true`.
    simulation distance and measured FPS.
 8. Press **F6** to toggle the adaptive governor on/off.
 
+## Install — NeoForge (PC)
+
+1. Install **NeoForge 26.3.0.97+** for Minecraft 26.3.
+2. Put `FPSMaxx-1.5.0-neoforge-mc26.3.jar` in the instance's `mods` folder.
+   You do **not** need Fabric API on NeoForge.
+3. If you use **Sodium**, install **Sodium NeoForge 0.9.3-beta.1+ for 26.3**.
+   Sodium NeoForge 0.9.2 has a broken `LevelExtractor` mixin on 26.3 and will
+   crash before the main menu.
+4. The in-game commands, keybind, presets and configuration are the same as the
+   Fabric build. The config lives at `config/fpsmaxx.json`.
+
 ## Install — PojavLauncher / MojoLauncher (Android)
 
-1. Your launcher profile **must use Java 25**. Minecraft 26.2 will not start on
+Use the **Fabric** jar; most mobile launchers do not support NeoForge yet.
+
+1. Your launcher profile **must use Java 25**. Minecraft 26.3 will not start on
    Java 8/17/21. If the launcher does not offer Java 25 yet, the game itself
-   cannot run 26.2 on that device — this is not a mod issue.
-2. Install **Fabric Loader 0.19.3+** for **26.2** inside the launcher.
-3. Copy `FPSMaxx-1.4.1-mc26.2.jar` **and** `fabric-api-0.161.0+26.2.jar` into
-   `.minecraft/mods`. If your launcher/GPU supports Sodium 0.9.1+ for 26.2,
-   install it too; FPSMaxx will detect it.
+   cannot run 26.3 on that device — this is not a mod issue.
+2. Install **Fabric Loader 0.20.1+** for **26.3** inside the launcher.
+3. Copy `FPSMaxx-1.5.0-fabric-mc26.3.jar` **and**
+   `fabric-api-0.165.0+26.3.jar` into `.minecraft/mods`. If your launcher/GPU
+   supports Sodium 0.9.2+ for 26.3, install it too; FPSMaxx will detect it.
 4. Allocate as much RAM as the device allows. 64 chunks is extremely heavy;
    start with the settings below. **Simulation 32 is too heavy for most phones**;
    the phone-safe config below sets it to 8.
@@ -353,7 +382,7 @@ simulation 32 may settle lower; use `/fpsmaxx lowend` or
   While VSync is on, FPSMaxx automatically uses the monitor refresh rate as the
   target (e.g. 60) instead of shrinking the world forever chasing an impossible
   number. `/fpsmaxx status` shows this as "VSync cap".
-- Use the **Vulkan** graphics backend if your GPU supports it (26.2 feature);
+- Use the **Vulkan** graphics backend if your GPU supports it (26.3 feature);
   the OpenGL backend is much slower on some systems.
 - Leave the governor on. `target 65` is the normal default; `/fpsmaxx lowend`
   sets a more realistic **60 FPS** target for weak hardware.
@@ -367,7 +396,7 @@ simulation 32 may settle lower; use `/fpsmaxx lowend` or
 - If chunk loading causes stutter, lower `/fpsmaxx sectionbudget` (for example
   to 32). A lower budget smooths frame time but makes newly loaded areas take
   longer to appear. Set it to 0 to use vanilla's unlimited behavior.
-- Install **Sodium 0.9.1+ for 26.2** when possible; FPSMaxx has a tested
+- Install **Sodium 0.9.2+ for 26.3** when possible; FPSMaxx has a tested
   integration for it. Leave `sodiumIntegration` enabled. If `/fpsmaxx status`
   reports no Sodium hook, use `/fpsmaxx mode render` instead.
 - If a resource pack or shader pack supplies custom fog, set
@@ -383,7 +412,8 @@ These are the remaining high-impact levers, in order:
    lower pixel count.
 3. Disable shader packs. Iris shaders can cost more than the vanilla renderer
    saves, especially at high shadow resolution.
-4. Use **Sodium 0.9.1+** and the **Vulkan** backend when your GPU supports it.
+4. Use **Sodium 0.9.2+** (Fabric) or **Sodium NeoForge 0.9.3-beta.1+**
+   (NeoForge) and the **Vulkan** backend when your GPU supports it.
 5. `/fpsmaxx simulation 5` or `6` and `/fpsmaxx render 8` if CPU time is the
    bottleneck. Simulation distance changes mob AI and ticking; render distance
    changes what is loaded.
@@ -401,11 +431,11 @@ hooks are active.
 
 | Mod / content | What to expect |
 |---|---|
-| **Sodium 0.9.1+** | Tested with 0.9.1 and 0.9.2. Adaptive terrain radius, a 64-chunk Sodium slider, and an **FPSMaxx** page in Sodium's Video Settings that opens the five-position preset slider. Chunks stay loaded. |
+| **Sodium** | Fabric: **0.9.2+ for 26.3**. NeoForge: **0.9.3-beta.1+ for 26.3** (0.9.2 NeoForge has a broken 26.3 mixin). Adaptive terrain radius, a 64-chunk Sodium slider, and an **FPSMaxx** page in Sodium's Video Settings that opens the five-position preset slider. Chunks stay loaded. |
 | **Iris** | Tested with Iris 1.11.2. FPSMaxx leaves shader fog alone when Iris is present, so the pack's atmosphere is preserved. |
 | **VulkanMod** | `adaptiveMode: auto` selects the real-render-distance fallback because VulkanMod does not expose Sodium's culling hook. The fallback is tested in vanilla/Sodium, not individually on VulkanMod. Expect chunk load/unload stutter. |
 | **Lithium / C2ME / ServerCore / VMP** | Server-side mixins are best-effort. C2ME's own render-distance uncap takes priority and FPSMaxx skips its Sodium slider overlay when C2ME is present. The client-side governor, culling and chunk budget still apply. |
-| **Fresh & Smooth** | Tested with the 26.2 release. Auto-detected; the FpsMaxx preset uses a visual-safe profile that keeps shaders, particles and animations. Use `/fpsmaxx aggressive` to force the full profile. |
+| **Fresh & Smooth** | Tested with the 26.3 release. Auto-detected; the FpsMaxx preset uses a visual-safe profile that keeps shaders, particles and animations. Use `/fpsmaxx aggressive` to force the full profile. |
 | **AsyncParticles / Particle Core** | When either particle optimizer is present, FPSMaxx defers all particle culling to it. This avoids duplicate culling and keeps async particle ticking thread-safe. |
 | **MoreCulling / EntityCulling / BadOptimizations / ImmediatelyFast** | Complementary. FPSMaxx's distance culling and chunk budget overlap harmlessly with their occlusion/visibility optimizations. |
 | **FerriteCore / ModernFix / Bobby / Nvidium** | No hard dependencies; optional hooks apply only if their target methods still exist. |
@@ -458,14 +488,19 @@ entities it does not have.
 ## Build from source
 
 ```bash
+# Fabric
 ./gradlew build
+
+# NeoForge
+./gradlew -p neoforge-probe build
 ```
 
-The jar is produced at `build/libs/fpsmaxx-1.4.1.jar`; the ready-to-install copy
-is `dist/mods/FPSMaxx-1.4.1-mc26.2.jar`. Toolchain: Gradle 9.7.1,
-Loom 1.18.4, Java 25, Minecraft 26.2 (unobfuscated, Mojang names).
+Fabric output: `build/libs/fpsmaxx-1.5.0.jar`  
+NeoForge output: `neoforge-probe/build/libs/fpsmaxx-neoforge-1.5.0.jar`
+
+Toolchain: Gradle 9.7.1, Fabric Loom 1.18.4 / NeoForge ModDevGradle 2.0.148,
+Java 25, Minecraft 26.3 (unobfuscated, Mojang names).
 
 ## License
 
 CC0-1.0. Do whatever you want with it.
-
