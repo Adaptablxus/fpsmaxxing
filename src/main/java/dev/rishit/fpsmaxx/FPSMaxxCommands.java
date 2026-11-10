@@ -218,6 +218,12 @@ public final class FPSMaxxCommands {
 					).withStyle(ChatFormatting.GREEN));
 					return 1;
 				}))
+				.then(ClientCommands.literal("performance").executes(ctx -> {
+					ctx.getSource().sendFeedback(Component.literal(
+						FPSMaxxPresets.applyPerformance(ctx.getSource().getClient())
+					).withStyle(ChatFormatting.GREEN));
+					return 1;
+				}))
 				.then(ClientCommands.literal("freshsmooth").executes(ctx -> {
 					ctx.getSource().sendFeedback(Component.literal(
 						FPSMaxxPresets.applyFreshSmooth(ctx.getSource().getClient(), null)
@@ -239,6 +245,17 @@ public final class FPSMaxxCommands {
 							"FPSMaxx Fresh & Smooth compatibility "
 								+ (config.freshSmoothCompatibility ? "enabled" : "disabled")
 								+ " (detected: " + (FPSMaxxCompat.FRESH_AND_SMOOTH ? "yes" : "no") + ")"
+						).withStyle(ChatFormatting.GREEN));
+						return 1;
+					})))
+				.then(ClientCommands.literal("adaptiveculling")
+					.then(ClientCommands.argument("enabled", BoolArgumentType.bool()).executes(ctx -> {
+						FPSMaxxConfig config = FPSMaxxConfig.get();
+						config.adaptiveCulling = BoolArgumentType.getBool(ctx, "enabled");
+						config.save();
+						FPSMaxxGovernor.onCullingToggled();
+						ctx.getSource().sendFeedback(Component.literal(
+							"FPSMaxx adaptive culling " + (config.adaptiveCulling ? "enabled" : "disabled")
 						).withStyle(ChatFormatting.GREEN));
 						return 1;
 					})))

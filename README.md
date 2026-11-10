@@ -11,32 +11,34 @@ graphics settings and bursty chunk-mesh rebuilds. It also adds a hidden
 plus a visual-safe profile for the **Fresh & Smooth** modpack. Install it on
 the client, not on the server.
 
-### What's new in 1.5.5
+### What's new in 1.5.6
 
-- **Adaptive simulation distance** - in singleplayer, the low-end and potato
-  profiles now lower simulation distance when the frame rate stays below target
-  and raise it back when there is headroom. Balanced mode keeps the old fixed
-  behavior. Control it with `/fpsmaxx simulationadaptive <true/false>` and
-  `/fpsmaxx minsimulation <chunks>`.
-- **`/fpsmaxx benchmark [seconds]`** - records average FPS, 1% low FPS, worst
-  frame, worst 1-second window, frames over 33/50 ms, and the visible-radius and
-  simulation-distance ranges. The report is saved to
-  `config/fpsmaxx-benchmark-*.txt`.
-- **GPU-aware first-run detection** - a fresh install reads the renderer name
-  and device type after the window opens, then applies the low-end or potato
-  mod-side profile when the GPU, CPU and RAM point that way. Existing configs
-  are never changed.
-- **Richer `/fpsmaxx status`** - adds the detected GPU, hardware tier, rolling
-  average/1% low/worst frame time, and benchmark progress.
-- **Alt-tab fix** - the governor and the frame-time sampler now ignore frames
-  while the window is inactive, so alt-tabbing no longer shrinks the world.
+- **Adaptive entity and block-entity culling** - when FPS stays below target,
+  the governor shrinks entity and block-entity cull distances by up to 50% and
+  restores them when the frame rate recovers. The configured values remain the
+  ceiling, so it never renders more than you asked for.
+- **`/fpsmaxx performance`** - one command that disables the Fresh & Smooth
+  visual-safe mode and applies the potato profile, including adaptive culling,
+  a 24-section update budget and a 60 FPS target.
+- **`/fpsmaxx adaptiveculling <true/false>`** - turn the new cull governor on or
+  off without changing the other profiles.
+- **Integrated-GPU first run** - integrated graphics with 8 GB or less of RAM,
+  a 4 GB-or-smaller heap, or four CPU threads now start with the potato profile
+  instead of the low-end profile. Existing configs are never changed.
+- **Potato profile persistence** - selecting potato or `/fpsmaxx performance`
+  now restores potato after a restart instead of falling back to low-end.
+- **Adaptive section budget** - the chunk-section budget scales with the cull
+  governor, so low FPS also reduces mesh-rebuild work.
+
+Also in 1.5.5: adaptive simulation distance, `/fpsmaxx benchmark`, GPU-aware
+first-run detection, richer status output and the alt-tab frame fix.
 
 ### Choose your build
 
 | Loader | Minecraft | Jar |
 |---|---|---|
-| Fabric | 26.3 | `FPSMaxx-1.5.5-fabric-mc26.3.jar` |
-| NeoForge | 26.3 | `FPSMaxx-1.5.5-neoforge-mc26.3.jar` |
+| Fabric | 26.3 | `FPSMaxx-1.5.6-fabric-mc26.3.jar` |
+| NeoForge | 26.3 | `FPSMaxx-1.5.6-neoforge-mc26.3.jar` |
 | Fabric | 26.2 | `FPSMaxx-1.4.1-mc26.2.jar` (previous release) |
 
 Fabric users also need **Fabric API 0.165.0+26.3**. NeoForge users need
@@ -50,7 +52,9 @@ smooth lighting, 16-chunk render distance, 8-chunk simulation distance, a
 on detected low-end hardware start with the mod-side low-end defaults
 automatically. If that is still not enough, **`/fpsmaxx potato`** goes further:
 render 8, simulation 5, tiny particle and entity distances, and a 24-section
-update budget.
+update budget. On **Fresh & Smooth**, `/fpsmaxx lowend` uses the visual-safe
+profile; run **`/fpsmaxx performance`** to disable that safe mode and apply the
+potato profile in one step.
 
 FPSMaxx also detects Sodium, Iris, VulkanMod and common optimization mods. The
 vanilla renderer and Sodium get the smooth visible-radius governor; VulkanMod
@@ -114,8 +118,8 @@ Modrinth: <https://modrinth.com/mod/fpsmaxx>
 | CPU | 32 simulation distance is CPU-heavy; use `/fpsmaxx lowend` on weak PCs |
 | Sodium (optional, Fabric) | **0.9.2+ for 26.3** (recommended) |
 | Sodium (optional, NeoForge) | **0.9.3-beta.1+ for 26.3** (0.9.2 has a broken 26.3 mixin) |
-| Fabric jar | `FPSMaxx-1.5.5-fabric-mc26.3.jar` |
-| NeoForge jar | `FPSMaxx-1.5.5-neoforge-mc26.3.jar` |
+| Fabric jar | `FPSMaxx-1.5.6-fabric-mc26.3.jar` |
+| NeoForge jar | `FPSMaxx-1.5.6-neoforge-mc26.3.jar` |
 
 ## Low-end PC quick start
 
@@ -158,16 +162,17 @@ If you only need a little more, use the individual commands instead:
 simulation, wider culls, no section budget). It does **not** restore the vanilla
 graphics or framerate options that `/fpsmaxx lowend` or `/fpsmaxx potato`
 changed; set those back in Video Settings if you want them. New installs on
-hardware detected as low-end (4 or fewer CPU cores, or 2 GB or less of allocated
-heap) start with the mod-side low-end defaults automatically, but the command is
-what applies the vanilla graphics reductions. You can force the first-run choice
-with `-Dfpsmaxx.forceLowEnd=true` or `-Dfpsmaxx.forceBalanced=true`.
+integrated graphics with 8 GB or less of RAM, a 4 GB-or-smaller heap, or four
+CPU threads start with the potato mod-side defaults; other low-end systems start
+with the low-end defaults. The command is what applies the vanilla graphics
+reductions. You can force the first-run choice with
+`-Dfpsmaxx.forceLowEnd=true` or `-Dfpsmaxx.forceBalanced=true`.
 
 ## Install — Fabric (PC: official launcher / Prism / MultiMC)
 
 1. Install Fabric Loader 0.20.1+ for Minecraft 26.3.
 2. Put these two files in the instance's `mods` folder:
-   - `FPSMaxx-1.5.5-fabric-mc26.3.jar`
+   - `FPSMaxx-1.5.6-fabric-mc26.3.jar`
    - `fabric-api-0.165.0+26.3.jar`
 3. If you use **Sodium**, install **Sodium 0.9.2+ for 26.3** as well. FPSMaxx
    detects it automatically, applies the same adaptive radius to Sodium's
@@ -188,7 +193,7 @@ with `-Dfpsmaxx.forceLowEnd=true` or `-Dfpsmaxx.forceBalanced=true`.
 ## Install — NeoForge (PC)
 
 1. Install **NeoForge 26.3.0.97+** for Minecraft 26.3.
-2. Put `FPSMaxx-1.5.5-neoforge-mc26.3.jar` in the instance's `mods` folder.
+2. Put `FPSMaxx-1.5.6-neoforge-mc26.3.jar` in the instance's `mods` folder.
    You do **not** need Fabric API on NeoForge.
 3. If you use **Sodium**, install **Sodium NeoForge 0.9.3-beta.1+ for 26.3**.
    Sodium NeoForge 0.9.2 has a broken `LevelExtractor` mixin on 26.3 and will
@@ -204,7 +209,7 @@ Use the **Fabric** jar; most mobile launchers do not support NeoForge yet.
    Java 8/17/21. If the launcher does not offer Java 25 yet, the game itself
    cannot run 26.3 on that device — this is not a mod issue.
 2. Install **Fabric Loader 0.20.1+** for **26.3** inside the launcher.
-3. Copy `FPSMaxx-1.5.5-fabric-mc26.3.jar` **and**
+3. Copy `FPSMaxx-1.5.6-fabric-mc26.3.jar` **and**
    `fabric-api-0.165.0+26.3.jar` into `.minecraft/mods`. If your launcher/GPU
    supports Sodium 0.9.2+ for 26.3, install it too; FPSMaxx will detect it.
 4. Allocate as much RAM as the device allows. 64 chunks is extremely heavy;
@@ -412,7 +417,7 @@ That measurement used a lower simulation distance. A CPU-limited machine with
 simulation 32 may settle lower; use `/fpsmaxx lowend` or
 `/fpsmaxx simulation 12` / `8` if the visible radius keeps dropping.
 
-Version 1.5.5 adds `/fpsmaxx benchmark`, so you can produce the same kind of
+Version 1.5.5 added `/fpsmaxx benchmark`, so you can produce the same kind of
 numbers on your own hardware instead of relying on a single superflat example.
 It reports average FPS, 1% low FPS, frame-time spikes and the actual visible
 radius range the governor used.
@@ -580,8 +585,8 @@ entities it does not have.
 ./gradlew -p neoforge-probe build
 ```
 
-Fabric output: `build/libs/fpsmaxx-1.5.5.jar`  
-NeoForge output: `neoforge-probe/build/libs/fpsmaxx-neoforge-1.5.5.jar`
+Fabric output: `build/libs/fpsmaxx-1.5.6.jar`  
+NeoForge output: `neoforge-probe/build/libs/fpsmaxx-neoforge-1.5.6.jar`
 
 Toolchain: Gradle 9.7.1, Fabric Loom 1.18.4 / NeoForge ModDevGradle 2.0.148,
 Java 25, Minecraft 26.3 (unobfuscated, Mojang names).

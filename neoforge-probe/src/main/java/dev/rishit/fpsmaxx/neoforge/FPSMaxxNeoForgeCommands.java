@@ -206,6 +206,10 @@ public final class FPSMaxxNeoForgeCommands {
 					feedback(ctx.getSource(), FPSMaxxPresets.applyPotato(Minecraft.getInstance()));
 					return 1;
 				}))
+				.then(Commands.literal("performance").executes(ctx -> {
+					feedback(ctx.getSource(), FPSMaxxPresets.applyPerformance(Minecraft.getInstance()));
+					return 1;
+				}))
 				.then(Commands.literal("freshsmooth").executes(ctx -> {
 					feedback(ctx.getSource(), FPSMaxxPresets.applyFreshSmooth(Minecraft.getInstance(), null));
 					return 1;
@@ -222,6 +226,16 @@ public final class FPSMaxxNeoForgeCommands {
 						feedback(ctx.getSource(), "FPSMaxx Fresh & Smooth compatibility "
 							+ (config.freshSmoothCompatibility ? "enabled" : "disabled")
 							+ " (detected: " + (FPSMaxxCompat.FRESH_AND_SMOOTH ? "yes" : "no") + ")");
+						return 1;
+					})))
+				.then(Commands.literal("adaptiveculling")
+					.then(Commands.argument("enabled", BoolArgumentType.bool()).executes(ctx -> {
+						FPSMaxxConfig config = FPSMaxxConfig.get();
+						config.adaptiveCulling = BoolArgumentType.getBool(ctx, "enabled");
+						config.save();
+						FPSMaxxGovernor.onCullingToggled();
+						feedback(ctx.getSource(), "FPSMaxx adaptive culling "
+							+ (config.adaptiveCulling ? "enabled" : "disabled"));
 						return 1;
 					})))
 				.then(Commands.literal("sectionbudget")

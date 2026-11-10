@@ -1,6 +1,5 @@
 package dev.rishit.fpsmaxx.mixin;
 
-import dev.rishit.fpsmaxx.FPSMaxxConfig;
 import dev.rishit.fpsmaxx.FPSMaxxGovernor;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
@@ -96,7 +95,7 @@ public abstract class LevelExtractorMixin {
 			return;
 		}
 
-		int cullDistance = FPSMaxxConfig.get().entityCullDistance;
+		int cullDistance = FPSMaxxGovernor.effectiveEntityCullDistance();
 		if (cullDistance <= 0) {
 			return;
 		}

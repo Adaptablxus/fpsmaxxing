@@ -27,17 +27,20 @@ if [[ "${PROJECT_STATUS}" == "404" ]]; then
   echo "Modrinth project ${PROJECT_ID} is not public yet; uploading the version anyway."
 fi
 
-CHANGELOG="FPSMaxx ${VERSION} adds adaptive simulation distance, a real frame-time benchmark, GPU-aware first-run profiles, and the Fabric/NeoForge 26.3 builds.
+CHANGELOG="FPSMaxx ${VERSION} adds adaptive entity/block-entity culling, a one-command performance profile, and a more aggressive integrated-GPU first run.
 
 How it optimizes:
 - Hidden FpsMaxx preset: drag the Graphics Preset slider all the way left. The FpsMaxx position applies the adaptive governor, all cull distances, the particle budget and the chunk-update budget together with the low-end graphics reductions.
 - Low-end preset: /fpsmaxx lowend applies Fast graphics, clouds off, cloud distance 2, minimal particles, render 16, simulation 8 and a 60 FPS target.
 - Potato preset: /fpsmaxx potato goes to render 8, simulation 5, tiny cull distances and a 24-section update budget.
+- Performance preset: /fpsmaxx performance disables the Fresh & Smooth visual-safe mode and applies the potato profile, adaptive culling and the 24-section budget in one command.
 - Adaptive chunk-section culling: chunks stay loaded, but only the affordable visible radius is submitted to the renderer.
+- Adaptive entity and block-entity culling: below-target FPS shrinks entity and block-entity cull distances by up to 50% and restores them when the frame rate recovers. Configured values remain the ceiling.
 - Adaptive simulation distance: in singleplayer, the low-end and potato profiles lower simulation distance after a sustained FPS deficit and raise it back when there is headroom. Balanced mode keeps it fixed.
 - Benchmark mode: /fpsmaxx benchmark [seconds] measures real frame intervals and reports average FPS, 1% low, worst frame, worst 1-second window, frames over 33/50 ms and the visible/simulation ranges. The full report is written to config/fpsmaxx-benchmark-*.txt.
-- GPU-aware first run: fresh installs read the renderer name/type, CPU threads, RAM and heap after the window opens and apply a low-end or potato mod-side profile. Existing configs are never changed.
-- Richer /fpsmaxx status: GPU, hardware tier, rolling average/1% low/worst frame time and benchmark progress.
+- GPU-aware first run: fresh installs read the renderer name/type, CPU threads, RAM and heap after the window opens. Integrated graphics with 8 GB or less of RAM or a 4 GB-or-smaller heap now get the potato profile. Existing configs are never changed.
+- Potato persistence: /fpsmaxx potato and /fpsmaxx performance now restore potato after a restart instead of falling back to low-end.
+- Richer /fpsmaxx status: GPU, hardware tier, rolling average/1% low/worst frame time, adaptive cull percentage and benchmark progress.
 - Alt-tab fix: the governor and frame sampler ignore frames while the window is inactive.
 - Chunk-update budgeting: caps mesh rebuilds per frame and re-queues the rest, smoothing stutter.
 - Particle culling and budgeting: rejects and removes distant particles, and shrinks the live cap when FPS falls.

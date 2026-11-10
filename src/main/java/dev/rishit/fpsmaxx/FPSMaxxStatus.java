@@ -44,8 +44,14 @@ public final class FPSMaxxStatus {
 			+ (config.forceSimulationDistance
 				? " chunks (request " + config.simulationDistance + ")"
 				: " chunks (manual)")
-			+ " | entity cull " + config.entityCullDistance
-			+ " | block entity cull " + config.blockEntityCullDistance
+			+ " | entity cull " + FPSMaxxGovernor.effectiveEntityCullDistance()
+			+ (config.adaptiveCulling && FPSMaxxGovernor.cullScale() < 1.0F
+				? "/" + config.entityCullDistance
+				: "")
+			+ " | block entity cull " + FPSMaxxGovernor.effectiveBlockEntityCullDistance()
+			+ (config.adaptiveCulling && FPSMaxxGovernor.cullScale() < 1.0F
+				? "/" + config.blockEntityCullDistance
+				: "")
 			+ " | particles " + (FPSMaxxCompat.ASYNC_PARTICLES
 				? "AsyncParticles"
 				: config.particleCullDistance + " blocks / " + config.maxParticles + " cap"
@@ -55,7 +61,10 @@ public final class FPSMaxxStatus {
 			+ " | section budget " + config.sectionUpdateBudget
 			+ (config.sectionUpdateBudget > 0
 				? " (now " + FPSMaxxGovernor.sectionUpdateBudget() + ")"
-				: " (vanilla)"));
+				: " (vanilla)")
+			+ (config.adaptiveCulling
+				? " | adaptive cull " + Math.round(FPSMaxxGovernor.cullScale() * 100.0F) + "%"
+				: ""));
 
 		lines.add("sodium " + sodium);
 		lines.add(FPSMaxxHardware.describe());

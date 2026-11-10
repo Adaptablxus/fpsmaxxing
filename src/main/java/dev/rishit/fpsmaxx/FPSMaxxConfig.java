@@ -2,6 +2,8 @@ package dev.rishit.fpsmaxx;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import dev.rishit.fpsmaxx.compat.FPSMaxxCompat;
 import org.slf4j.Logger;
@@ -31,6 +33,12 @@ public final class FPSMaxxConfig {
 
 	/** Informational flag set by the low-end preset. */
 	public boolean lowEndMode = false;
+
+	/**
+	 * True when the potato profile is the active mod-side profile. The hidden
+	 * FpsMaxx preset uses this to restore potato rather than low-end on startup.
+	 */
+	public boolean potatoMode = false;
 
 	/**
 	 * True when the hidden FpsMaxx graphics preset is selected in Video
@@ -119,6 +127,14 @@ public final class FPSMaxxConfig {
 	public boolean adaptiveParticles = true;
 
 	/**
+	 * Let the governor shrink entity and block-entity cull distances when FPS is
+	 * below target. The configured distances stay as the ceiling and are restored
+	 * when the frame rate recovers. This is a rendering-only lever, so it never
+	 * changes gameplay or server-side ticking.
+	 */
+	public boolean adaptiveCulling = false;
+
+	/**
 	 * Maximum chunk-section mesh rebuilds scheduled in one frame. 0 = vanilla
 	 * (unlimited). A budget smooths the frame-time spikes caused by rebuilding
 	 * many sections at once; skipped sections are re-queued for the next frame.
@@ -141,11 +157,18 @@ public final class FPSMaxxConfig {
 		if (!fresh) {
 			try {
 				String json = Files.readString(path, StandardCharsets.UTF_8);
-				FPSMaxxConfig loaded = GSON.fromJson(json, FPSMaxxConfig.class);
+				JsonObject object = JsonParser.parseString(json).getAsJsonObject();
+				FPSMaxxConfig loaded = GSON.fromJson(object, FPSMaxxConfig.class);
 				if (loaded != null) {
 					instance = loaded;
+					// 1.5.6 adds adaptive culling. Configs that were already on a
+					// low-end profile keep that intent; balanced/custom configs
+					// are left exactly as they were.
+					if (!object.has("adaptiveCulling") && loaded.lowEndMode) {
+						loaded.adaptiveCulling = true;
+					}
 				}
-			} catch (IOException | JsonSyntaxException e) {
+			} catch (IOException | JsonSyntaxException | IllegalStateException e) {
 				LOGGER.warn("Could not read {}, using defaults", path, e);
 			}
 		}
@@ -179,6 +202,7 @@ public final class FPSMaxxConfig {
 	/** Mod-side defaults for a low-end machine. Vanilla graphics are applied by /fpsmaxx lowend. */
 	public void applyLowEndDefaults() {
 		lowEndMode = true;
+		potatoMode = false;
 		targetFps = FPSMaxxConstants.LOW_END_TARGET_FPS;
 		adaptiveEnabled = true;
 		initialVisibleDistance = FPSMaxxConstants.LOW_END_INITIAL_VISIBLE_DISTANCE;
@@ -196,12 +220,14 @@ public final class FPSMaxxConfig {
 		particleCullDistance = FPSMaxxConstants.LOW_END_PARTICLE_CULL_DISTANCE;
 		maxParticles = FPSMaxxConstants.LOW_END_MAX_PARTICLES;
 		adaptiveParticles = true;
+		adaptiveCulling = true;
 		sectionUpdateBudget = FPSMaxxConstants.LOW_END_SECTION_UPDATE_BUDGET;
 	}
 
 	/** Mod-side defaults for an extremely weak device. */
 	public void applyPotatoDefaults() {
 		lowEndMode = true;
+		potatoMode = true;
 		targetFps = FPSMaxxConstants.POTATO_TARGET_FPS;
 		adaptiveEnabled = true;
 		initialVisibleDistance = FPSMaxxConstants.POTATO_INITIAL_VISIBLE_DISTANCE;
@@ -219,6 +245,7 @@ public final class FPSMaxxConfig {
 		particleCullDistance = FPSMaxxConstants.POTATO_PARTICLE_CULL_DISTANCE;
 		maxParticles = FPSMaxxConstants.POTATO_MAX_PARTICLES;
 		adaptiveParticles = true;
+		adaptiveCulling = true;
 		sectionUpdateBudget = FPSMaxxConstants.POTATO_SECTION_UPDATE_BUDGET;
 	}
 
@@ -229,6 +256,7 @@ public final class FPSMaxxConfig {
 	 */
 	public void applyFreshSmoothDefaults() {
 		lowEndMode = true;
+		potatoMode = false;
 		targetFps = FPSMaxxConstants.FRESH_SMOOTH_TARGET_FPS;
 		adaptiveEnabled = true;
 		initialVisibleDistance = FPSMaxxConstants.FRESH_SMOOTH_INITIAL_VISIBLE_DISTANCE;
@@ -248,12 +276,14 @@ public final class FPSMaxxConfig {
 		particleCullDistance = FPSMaxxConstants.FRESH_SMOOTH_PARTICLE_CULL_DISTANCE;
 		maxParticles = FPSMaxxConstants.FRESH_SMOOTH_MAX_PARTICLES;
 		adaptiveParticles = true;
+		adaptiveCulling = true;
 		sectionUpdateBudget = FPSMaxxConstants.FRESH_SMOOTH_SECTION_UPDATE_BUDGET;
 	}
 
 	/** Mod-side defaults for a normal PC. Vanilla graphics are left untouched. */
 	public void applyBalancedDefaults() {
 		lowEndMode = false;
+		potatoMode = false;
 		graphicsPresetFpsMaxx = false;
 		targetFps = FPSMaxxConstants.BALANCED_TARGET_FPS;
 		adaptiveEnabled = true;
@@ -272,6 +302,7 @@ public final class FPSMaxxConfig {
 		particleCullDistance = FPSMaxxConstants.BALANCED_PARTICLE_CULL_DISTANCE;
 		maxParticles = FPSMaxxConstants.BALANCED_MAX_PARTICLES;
 		adaptiveParticles = true;
+		adaptiveCulling = false;
 		sectionUpdateBudget = FPSMaxxConstants.BALANCED_SECTION_UPDATE_BUDGET;
 	}
 

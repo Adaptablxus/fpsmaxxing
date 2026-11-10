@@ -38,9 +38,26 @@ public final class FPSMaxxPresets {
 	 * the pack's shaders, particles and animations keep working.</p>
 	 */
 	public static String applyFpsMaxx(Minecraft client, OptionsSubScreen screen) {
+		FPSMaxxConfig config = FPSMaxxConfig.get();
+		if (config.potatoMode) {
+			return applyPerformancePreset(client, true, screen);
+		}
 		return useFreshSmoothProfile()
 			? applyFreshSmooth(client, screen)
 			: applyPerformancePreset(client, false, screen);
+	}
+
+	/**
+	 * One-command aggressive profile for a machine that is still struggling.
+	 * Disables the Fresh &amp; Smooth visual-safe mode and applies the potato
+	 * profile, including adaptive culling and the 24-section update budget.
+	 */
+	public static String applyPerformance(Minecraft client) {
+		FPSMaxxConfig config = FPSMaxxConfig.get();
+		config.freshSmoothCompatibility = false;
+		config.save();
+		return applyPerformancePreset(client, true, null)
+			+ " Fresh & Smooth safe mode disabled; adaptive culling is active.";
 	}
 
 	/** Force the aggressive profile even when the Fresh &amp; Smooth pack is detected. */

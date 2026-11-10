@@ -30,6 +30,9 @@ public final class FPSMaxxGovernor {
 	private static ClientLevel lastLevel;
 	private static String lastEffectiveMode;
 	private static float particleScale = 1.0F;
+	private static volatile float cullScale = 1.0F;
+	private static int cullLowStreak;
+	private static int cullHighStreak;
 
 	private static int simulationDistance = -1;
 	private static int requestedSimulationDistance = -1;
@@ -51,6 +54,9 @@ public final class FPSMaxxGovernor {
 			requestedSimulationDistance = -1;
 			simLowStreak = 0;
 			simHighStreak = 0;
+			cullScale = 1.0F;
+			cullLowStreak = 0;
+			cullHighStreak = 0;
 			return;
 		}
 
@@ -88,6 +94,9 @@ public final class FPSMaxxGovernor {
 			settleUntil = now + 4000L;
 			goodStreak = 0;
 			particleScale = 1.0F;
+			cullScale = 1.0F;
+			cullLowStreak = 0;
+			cullHighStreak = 0;
 			invalidateSectionGraph();
 			return;
 		}
@@ -95,6 +104,9 @@ public final class FPSMaxxGovernor {
 		if (!config.adaptiveEnabled) {
 			visibleDistance = -1;
 			particleScale = 1.0F;
+			cullScale = 1.0F;
+			cullLowStreak = 0;
+			cullHighStreak = 0;
 			return;
 		}
 
@@ -142,6 +154,8 @@ public final class FPSMaxxGovernor {
 		} else {
 			particleScale = 1.0F;
 		}
+
+		tickAdaptiveCulling(config, fps, target);
 
 		if (fps < target - 5) {
 			// Drop fast when below target. Compiling newly visible chunk meshes
@@ -277,6 +291,47 @@ public final class FPSMaxxGovernor {
 		} else {
 			simLowStreak = 0;
 			simHighStreak = 0;
+		}
+	}
+
+	/**
+	 * Entity and block-entity rendering is the second-largest lever after the
+	 * visible radius. Shrink the configured cull distances after a sustained
+	 * deficit and restore them when the frame rate recovers. The configured
+	 * values remain the ceiling, so this never exceeds the player's settings.
+	 */
+	private static void tickAdaptiveCulling(FPSMaxxConfig config, int fps, int target) {
+		if (!config.adaptiveCulling) {
+			cullScale = 1.0F;
+			cullLowStreak = 0;
+			cullHighStreak = 0;
+			return;
+		}
+
+		float floor = config.freshSmoothCompatibility ? 0.75F : 0.5F;
+		if (fps < target - 8) {
+			cullHighStreak = 0;
+			cullLowStreak++;
+			if (cullLowStreak >= 2 && cullScale > floor) {
+				cullScale = Math.max(floor, cullScale - 0.1F);
+				cullLowStreak = 0;
+				FPSMaxxBootstrap.LOGGER.debug(
+					"Adaptive culling scale -> {} (FPS {}, target {})",
+					cullScale,
+					fps,
+					target
+				);
+			}
+		} else if (fps > target + 12) {
+			cullLowStreak = 0;
+			cullHighStreak++;
+			if (cullHighStreak >= 4 && cullScale < 1.0F) {
+				cullScale = Math.min(1.0F, cullScale + 0.05F);
+				cullHighStreak = 0;
+			}
+		} else {
+			cullLowStreak = 0;
+			cullHighStreak = 0;
 		}
 	}
 
@@ -441,6 +496,29 @@ public final class FPSMaxxGovernor {
 		return particleScale;
 	}
 
+	/** 1.0 = configured cull distances, 0.5 = the low-end floor. */
+	public static float cullScale() {
+		return cullScale;
+	}
+
+	public static int effectiveEntityCullDistance() {
+		FPSMaxxConfig config = FPSMaxxConfig.get();
+		if (config.entityCullDistance <= 0) {
+			return 0;
+		}
+		float scale = config.adaptiveCulling ? cullScale : 1.0F;
+		return Math.max(16, Math.round(config.entityCullDistance * scale));
+	}
+
+	public static int effectiveBlockEntityCullDistance() {
+		FPSMaxxConfig config = FPSMaxxConfig.get();
+		if (config.blockEntityCullDistance <= 0) {
+			return 0;
+		}
+		float scale = config.adaptiveCulling ? cullScale : 1.0F;
+		return Math.max(8, Math.round(config.blockEntityCullDistance * scale));
+	}
+
 	/**
 	 * Section mesh rebuilds are bursty: a single frame can otherwise schedule
 	 * hundreds of compiles and cause a visible stutter. When the FPS is already
@@ -451,6 +529,10 @@ public final class FPSMaxxGovernor {
 		int budget = config.sectionUpdateBudget;
 		if (budget <= 0) {
 			return 0;
+		}
+
+		if (config.adaptiveCulling) {
+			budget = Math.max(1, Math.round(budget * cullScale));
 		}
 
 		Minecraft client = Minecraft.getInstance();
@@ -472,10 +554,15 @@ public final class FPSMaxxGovernor {
 		return visible > 0 ? Math.min(vanillaEffectiveDistance, visible) : vanillaEffectiveDistance;
 	}
 
+	public static void onCullingToggled() {
+		cullScale = 1.0F;
+		cullLowStreak = 0;
+		cullHighStreak = 0;
+	}
+
 	public static void onAdaptiveToggled() {
 		Minecraft client = Minecraft.getInstance();
 		FPSMaxxConfig config = FPSMaxxConfig.get();
-
 		if ("render".equals(lastEffectiveMode) && maxRenderDistance > 0) {
 			applyRenderDistance(client, maxRenderDistance);
 		}
@@ -507,6 +594,9 @@ public final class FPSMaxxGovernor {
 		settleUntil = 0L;
 		goodStreak = 0;
 		particleScale = 1.0F;
+		cullScale = 1.0F;
+		cullLowStreak = 0;
+		cullHighStreak = 0;
 		requestedSimulationDistance = -1;
 		simulationDistance = -1;
 		simLowStreak = 0;
@@ -537,6 +627,7 @@ public final class FPSMaxxGovernor {
 			+ " | " + distanceText
 			+ " | " + simText
 			+ " | target " + targetText
+			+ (config.adaptiveCulling ? " | cull " + Math.round(cullScale * 100.0F) + "%" : "")
 			+ " | current " + client.getFps() + " FPS"
 			+ (benchmark != null ? " | " + benchmark : "");
 	}

@@ -9,27 +9,28 @@ integration.
 
 It is not a cheat and does not need to be installed on the server.
 
-## What's new in 1.5.5
+## What's new in 1.5.6
 
-- **Adaptive simulation distance** - low-end and potato profiles lower
-  simulation distance when FPS stays below target in singleplayer and raise it
-  back when there is headroom. Balanced mode keeps it fixed.
-- **`/fpsmaxx benchmark [seconds]`** - real frame-time measurement with average
-  FPS, 1% low FPS, worst frame, worst 1-second window, frame-time spike
-  percentages, and visible-radius/simulation-distance ranges.
-- **GPU-aware first-run detection** - fresh installs read the renderer name,
-  device type, CPU and RAM after the window opens and choose a low-end or potato
-  mod-side profile. Existing configs are untouched.
-- **Richer `/fpsmaxx status`** - GPU, hardware tier, rolling average/1% low/worst
-  frame time, and benchmark progress.
-- **Alt-tab fix** - the governor ignores frames while the window is inactive.
+- **Adaptive entity and block-entity culling** - below-target FPS shrinks entity
+  and block-entity cull distances by up to 50%; they recover when the frame rate
+  does. The configured values remain the ceiling.
+- **`/fpsmaxx performance`** - disables the Fresh & Smooth visual-safe mode and
+  applies the potato profile in one command.
+- **`/fpsmaxx adaptiveculling <true/false>`** - toggle the new cull governor.
+- **Integrated-GPU first run** - integrated graphics with 8 GB or less of RAM, a
+  4 GB-or-smaller heap, or four CPU threads now start with potato defaults.
+- **Potato persistence** - potato and `/fpsmaxx performance` survive a restart.
+- **Adaptive section budget** - the section budget scales with the cull governor.
+
+Also in 1.5.5: adaptive simulation distance, `/fpsmaxx benchmark`, GPU-aware
+first-run detection, richer status output and the alt-tab frame fix.
 
 ## Choose your build
 
 | Loader | Minecraft | Jar |
 |---|---|---|
-| Fabric | 26.3 | `FPSMaxx-1.5.5-fabric-mc26.3.jar` |
-| NeoForge | 26.3 | `FPSMaxx-1.5.5-neoforge-mc26.3.jar` |
+| Fabric | 26.3 | `FPSMaxx-1.5.6-fabric-mc26.3.jar` |
+| NeoForge | 26.3 | `FPSMaxx-1.5.6-neoforge-mc26.3.jar` |
 | Fabric | 26.2 | `FPSMaxx-1.4.1-mc26.2.jar` (previous release) |
 
 Fabric users also need **Fabric API 0.165.0+26.3**. NeoForge users need
@@ -109,6 +110,10 @@ or mob-AI optimizer.
 
 - **Adaptive chunk-section culling** - chunks stay loaded, but only sections
   inside the affordable visible radius are submitted to the renderer.
+- **Adaptive entity and block-entity culling** - below-target FPS reduces the
+  entity and block-entity cull radii by up to 50%; they recover when the frame
+  rate does. This targets villages, farms and storage rooms without unloading
+  chunks or changing gameplay.
 - **Sodium integration** - caps Sodium's terrain search distance and fog to the
   same radius, without unloading chunks.
 - **Entity and block-entity culling** - skips distant entities and block entities
@@ -160,7 +165,7 @@ while keeping the requested chunks loaded.
 1. Install **Fabric Loader 0.20.1+** for **Minecraft 26.3** with **Java 25**.
 2. Install **Fabric API 0.165.0+26.3**.
 3. Optional but recommended: install **Sodium 0.9.2+ for 26.3**.
-4. Put `FPSMaxx-1.5.5-fabric-mc26.3.jar` in your `mods` folder. Delete any older
+4. Put `FPSMaxx-1.5.6-fabric-mc26.3.jar` in your `mods` folder. Delete any older
    FPSMaxx jar first.
 5. Allocate **4 GB or more** of RAM for 64 chunks (6 GB recommended). A 2 GB
    low-end PC can still play with fewer chunks.
@@ -171,7 +176,7 @@ while keeping the requested chunks loaded.
 ## Install — NeoForge
 
 1. Install **NeoForge 26.3.0.97+** for **Minecraft 26.3** with **Java 25**.
-2. Put `FPSMaxx-1.5.5-neoforge-mc26.3.jar` in your `mods` folder. Fabric API is
+2. Put `FPSMaxx-1.5.6-neoforge-mc26.3.jar` in your `mods` folder. Fabric API is
    not needed on NeoForge.
 3. Optional but recommended: install **Sodium NeoForge 0.9.3-beta.1+ for 26.3**.
    Sodium NeoForge 0.9.2 has a broken `LevelExtractor` mixin on 26.3.
@@ -186,6 +191,8 @@ while keeping the requested chunks loaded.
 | `/fpsmaxx preset` | Open the five-position FpsMaxx graphics-preset screen (works with any renderer) |
 | `/fpsmaxx lowend` | Apply the complete low-end PC profile (Fresh & Smooth safe when detected) |
 | `/fpsmaxx potato` | Apply the extreme low-end profile |
+| `/fpsmaxx performance` | Disable the Fresh & Smooth safe mode and apply the full potato profile |
+| `/fpsmaxx adaptiveculling <true/false>` | Enable/disable adaptive entity and block-entity culling |
 | `/fpsmaxx freshsmooth` | Apply the visual-safe Fresh & Smooth profile explicitly |
 | `/fpsmaxx aggressive` | Force the full low-end profile even when Fresh & Smooth is detected |
 | `/fpsmaxx visual <true/false>` | Enable/disable the automatic Fresh & Smooth visual-safe profile |

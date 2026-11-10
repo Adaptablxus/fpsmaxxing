@@ -70,6 +70,16 @@ jobs:
             tiny cull distances and a 24-section update budget.
           - **Adaptive chunk-section culling** - chunks stay loaded, but only the
             affordable visible radius is submitted to the renderer.
+          - **Adaptive entity and block-entity culling** - below-target FPS
+            shrinks entity and block-entity cull distances by up to 50% and
+            restores them when the frame rate recovers.
+          - **Performance preset** - \`/fpsmaxx performance\` disables the Fresh &
+            Smooth visual-safe mode and applies the potato profile, adaptive
+            culling and the 24-section budget in one command.
+          - **Integrated-GPU first run** - integrated graphics with 8 GB or less
+            of RAM or a 4 GB-or-smaller heap now get the potato profile.
+          - **Potato persistence** - potato and \`/fpsmaxx performance\` survive a
+            restart instead of falling back to low-end.
           - **Adaptive simulation distance** - in singleplayer, the low-end and
             potato profiles lower simulation distance after a sustained FPS
             deficit and raise it back when there is headroom. Balanced mode

@@ -165,7 +165,10 @@ public final class FPSMaxxHardware {
 			return Tier.LOW;
 		}
 		if (type.equals("integrated")) {
-			if (cores <= 6 || ramMb <= 8192L) {
+			if (ramMb <= 8192L || heapMb <= 4096L || cores <= 4) {
+				return Tier.POTATO;
+			}
+			if (cores <= 6) {
 				return Tier.LOW;
 			}
 			return Tier.MID;

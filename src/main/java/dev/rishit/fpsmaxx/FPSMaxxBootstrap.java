@@ -36,7 +36,7 @@ public final class FPSMaxxBootstrap {
 			FPSMaxxConfig.get().adaptiveEnabled
 		);
 		LOGGER.info(
-			"FPSMaxx low-end mode {}: target {} FPS, particle cull {} blocks, particle cap {} (adaptive {}), entity cull {} blocks, block-entity cull {} blocks, section budget {}",
+			"FPSMaxx low-end mode {}: target {} FPS, particle cull {} blocks, particle cap {} (adaptive {}), entity cull {} blocks, block-entity cull {} blocks, section budget {}, adaptive culling {}",
 			FPSMaxxConfig.get().lowEndMode ? "ON" : "OFF",
 			FPSMaxxConfig.get().targetFps,
 			FPSMaxxConfig.get().particleCullDistance,
@@ -44,7 +44,8 @@ public final class FPSMaxxBootstrap {
 			FPSMaxxConfig.get().adaptiveParticles,
 			FPSMaxxConfig.get().entityCullDistance,
 			FPSMaxxConfig.get().blockEntityCullDistance,
-			FPSMaxxConfig.get().sectionUpdateBudget
+			FPSMaxxConfig.get().sectionUpdateBudget,
+			FPSMaxxConfig.get().adaptiveCulling
 		);
 		if (safeDistance < FPSMaxxConstants.MAX_RENDER_DISTANCE) {
 			LOGGER.warn(

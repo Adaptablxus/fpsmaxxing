@@ -1,6 +1,6 @@
 package dev.rishit.fpsmaxx.mixin;
 
-import dev.rishit.fpsmaxx.FPSMaxxConfig;
+import dev.rishit.fpsmaxx.FPSMaxxGovernor;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
@@ -35,7 +35,7 @@ public abstract class BlockEntityRenderDispatcherMixin {
 			return;
 		}
 
-		int cullDistance = FPSMaxxConfig.get().blockEntityCullDistance;
+		int cullDistance = FPSMaxxGovernor.effectiveBlockEntityCullDistance();
 		if (cullDistance <= 0) {
 			return;
 		}
