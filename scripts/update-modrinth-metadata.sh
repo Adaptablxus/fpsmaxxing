@@ -16,9 +16,18 @@ jq -n \
     requested_status: "approved"
   }' > "${DATA_FILE}"
 
-curl --fail-with-body --retry 3 --retry-delay 2 \
+RESPONSE_FILE="project-metadata-response.json"
+HTTP_CODE=$(curl --silent --show-error --retry 3 --retry-delay 2 \
+  --output "${RESPONSE_FILE}" --write-out '%{http_code}' \
   -X PATCH "https://api.modrinth.com/v2/project/${PROJECT_ID}" \
   -H "Authorization: Bearer ${MODRINTH_TOKEN}" \
   -H "User-Agent: FPSMaxx-metadata-workflow" \
   -H "Content-Type: application/json" \
-  --data-binary "@${DATA_FILE}"
+  --data-binary "@${DATA_FILE}")
+
+if [[ "${HTTP_CODE}" -lt 200 || "${HTTP_CODE}" -ge 300 ]]; then
+  echo "::error::Modrinth PATCH failed (HTTP ${HTTP_CODE}): $(cat "${RESPONSE_FILE}")"
+  exit 1
+fi
+
+echo "Modrinth project metadata updated (HTTP ${HTTP_CODE})."

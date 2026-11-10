@@ -43,6 +43,8 @@ replay_*.log
 
 project-data.json
 project-response.json
+project-metadata.json
+project-metadata-response.json
 version-data.json
 version-response.json
 
