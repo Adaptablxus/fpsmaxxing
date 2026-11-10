@@ -5,11 +5,11 @@ issueTrackerURL = "https://github.com/Adaptablxus/fpsmaxxing/issues"
 
 [[mods]]
 modId = "fpsmaxx"
-version = "1.5.0"
+version = "1.5.5"
 displayName = "FPSMaxx"
 authors = "Rishit"
 description = '''
-Client-side NeoForge optimization for Minecraft 26.3: hidden FpsMaxx graphics preset, 64-chunk render distance, adaptive FPS governor, low-end/potato profiles, entity/block-entity/particle culling, chunk budgeting, Fresh & Smooth support, and Sodium integration.
+Client-side NeoForge optimization for Minecraft 26.3: hidden FpsMaxx graphics preset, 64-chunk render distance, adaptive FPS governor, adaptive simulation distance, /fpsmaxx benchmark with 1% lows, GPU-aware first-run profiles, low-end/potato profiles, entity/block-entity/particle culling, chunk budgeting, Fresh & Smooth support, and Sodium integration.
 '''
 
 [[mixins]]

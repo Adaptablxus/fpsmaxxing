@@ -70,6 +70,19 @@ jobs:
             tiny cull distances and a 24-section update budget.
           - **Adaptive chunk-section culling** - chunks stay loaded, but only the
             affordable visible radius is submitted to the renderer.
+          - **Adaptive simulation distance** - in singleplayer, the low-end and
+            potato profiles lower simulation distance after a sustained FPS
+            deficit and raise it back when there is headroom. Balanced mode
+            keeps it fixed.
+          - **Benchmark mode** - \`/fpsmaxx benchmark [seconds]\` measures real
+            frame intervals and reports average FPS, 1% low, worst frame, worst
+            1-second window, frames over 33/50 ms and the radius ranges. The
+            full report is written to \`config/fpsmaxx-benchmark-*.txt\`.
+          - **GPU-aware first run** - fresh installs read the renderer, CPU and
+            RAM after the window opens and apply a low-end or potato mod-side
+            profile. Existing configs are never changed.
+          - **Richer status** - \`/fpsmaxx status\` shows the GPU, hardware tier,
+            rolling average/1% low/worst frame time and benchmark progress.
           - **Chunk-update budgeting** - caps mesh rebuilds per frame and re-queues
             the rest, smoothing stutter.
           - **Particle culling and budgeting** - rejects and removes distant
@@ -98,7 +111,8 @@ jobs:
 
           It is a rendering optimization mod, not a mob-AI or server optimizer.
           Simulation distance 32 is CPU-heavy; low-end lowers it to 8 and potato
-          lowers it to 5.
+          lowers it to 5. In singleplayer those profiles can lower it further
+          when FPS stays below target.
 
           **Full documentation:** https://github.com/Adaptablxus/fpsmaxxing
           **Modrinth:** https://modrinth.com/mod/fpsmaxx

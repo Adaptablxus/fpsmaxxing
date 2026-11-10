@@ -76,6 +76,9 @@ public final class FPSMaxxBootstrap {
 		if (FPSMaxxCompat.ASYNC_PARTICLES || FPSMaxxCompat.PARTICLE_CORE) {
 			LOGGER.info("FPSMaxx: dedicated particle optimizer detected; FPSMaxx particle culling is deferred to it");
 		}
+		LOGGER.info(
+			"FPSMaxx metrics: /fpsmaxx benchmark [5-120] records average FPS, 1% low, frame times, visible radius and simulation distance"
+		);
 	}
 
 	public static void onClientTick(Minecraft client, KeyMapping toggleKey) {
@@ -96,6 +99,8 @@ public final class FPSMaxxBootstrap {
 			}
 		}
 
+		FPSMaxxHardware.tick(client);
 		FPSMaxxGovernor.tick(client);
+		FPSMaxxMetrics.tick(client);
 	}
 }

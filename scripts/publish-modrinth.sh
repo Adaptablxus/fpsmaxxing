@@ -26,13 +26,18 @@ if [[ "${PROJECT_STATUS}" == "404" ]]; then
   exit 0
 fi
 
-CHANGELOG="FPSMaxx ${VERSION} adds Fabric and NeoForge builds for Minecraft 26.3.
+CHANGELOG="FPSMaxx ${VERSION} adds adaptive simulation distance, a real frame-time benchmark, GPU-aware first-run profiles, and the Fabric/NeoForge 26.3 builds.
 
 How it optimizes:
 - Hidden FpsMaxx preset: drag the Graphics Preset slider all the way left. The FpsMaxx position applies the adaptive governor, all cull distances, the particle budget and the chunk-update budget together with the low-end graphics reductions.
 - Low-end preset: /fpsmaxx lowend applies Fast graphics, clouds off, cloud distance 2, minimal particles, render 16, simulation 8 and a 60 FPS target.
 - Potato preset: /fpsmaxx potato goes to render 8, simulation 5, tiny cull distances and a 24-section update budget.
 - Adaptive chunk-section culling: chunks stay loaded, but only the affordable visible radius is submitted to the renderer.
+- Adaptive simulation distance: in singleplayer, the low-end and potato profiles lower simulation distance after a sustained FPS deficit and raise it back when there is headroom. Balanced mode keeps it fixed.
+- Benchmark mode: /fpsmaxx benchmark [seconds] measures real frame intervals and reports average FPS, 1% low, worst frame, worst 1-second window, frames over 33/50 ms and the visible/simulation ranges. The full report is written to config/fpsmaxx-benchmark-*.txt.
+- GPU-aware first run: fresh installs read the renderer name/type, CPU threads, RAM and heap after the window opens and apply a low-end or potato mod-side profile. Existing configs are never changed.
+- Richer /fpsmaxx status: GPU, hardware tier, rolling average/1% low/worst frame time and benchmark progress.
+- Alt-tab fix: the governor and frame sampler ignore frames while the window is inactive.
 - Chunk-update budgeting: caps mesh rebuilds per frame and re-queues the rest, smoothing stutter.
 - Particle culling and budgeting: rejects and removes distant particles, and shrinks the live cap when FPS falls.
 - Sodium integration: caps Sodium's terrain search distance and fog to the same radius without unloading chunks, and adds a searchable FPSMaxx page with an Open FPSMaxx preset screen button to Sodium's Video Settings.

@@ -11,12 +11,32 @@ graphics settings and bursty chunk-mesh rebuilds. It also adds a hidden
 plus a visual-safe profile for the **Fresh & Smooth** modpack. Install it on
 the client, not on the server.
 
+### What's new in 1.5.5
+
+- **Adaptive simulation distance** - in singleplayer, the low-end and potato
+  profiles now lower simulation distance when the frame rate stays below target
+  and raise it back when there is headroom. Balanced mode keeps the old fixed
+  behavior. Control it with `/fpsmaxx simulationadaptive <true/false>` and
+  `/fpsmaxx minsimulation <chunks>`.
+- **`/fpsmaxx benchmark [seconds]`** - records average FPS, 1% low FPS, worst
+  frame, worst 1-second window, frames over 33/50 ms, and the visible-radius and
+  simulation-distance ranges. The report is saved to
+  `config/fpsmaxx-benchmark-*.txt`.
+- **GPU-aware first-run detection** - a fresh install reads the renderer name
+  and device type after the window opens, then applies the low-end or potato
+  mod-side profile when the GPU, CPU and RAM point that way. Existing configs
+  are never changed.
+- **Richer `/fpsmaxx status`** - adds the detected GPU, hardware tier, rolling
+  average/1% low/worst frame time, and benchmark progress.
+- **Alt-tab fix** - the governor and the frame-time sampler now ignore frames
+  while the window is inactive, so alt-tabbing no longer shrinks the world.
+
 ### Choose your build
 
 | Loader | Minecraft | Jar |
 |---|---|---|
-| Fabric | 26.3 | `FPSMaxx-1.5.0-fabric-mc26.3.jar` |
-| NeoForge | 26.3 | `FPSMaxx-1.5.0-neoforge-mc26.3.jar` |
+| Fabric | 26.3 | `FPSMaxx-1.5.5-fabric-mc26.3.jar` |
+| NeoForge | 26.3 | `FPSMaxx-1.5.5-neoforge-mc26.3.jar` |
 | Fabric | 26.2 | `FPSMaxx-1.4.1-mc26.2.jar` (previous release) |
 
 Fabric users also need **Fabric API 0.165.0+26.3**. NeoForge users need
@@ -73,8 +93,8 @@ Modrinth: <https://modrinth.com/mod/fpsmaxx>
 > - it grows the visible radius back automatically when you have headroom;
 > - it keeps simulation distance configurable: **32 on a normal PC** and
 >   **8 in the low-end preset**, so mob AI and ticking can be reduced when the
->   CPU is the bottleneck. Simulation distance is deliberately **not**
->   adaptive; lower it manually on a phone or weak laptop.
+>   CPU is the bottleneck. The low-end and potato profiles can also lower it
+>   adaptively when FPS stays below target; balanced mode leaves it fixed.
 >
 > On a strong gaming PC you will sit at 64 chunks. On integrated graphics or a
 > phone it will settle at a lower visible distance and stay playable. If a device
@@ -94,8 +114,8 @@ Modrinth: <https://modrinth.com/mod/fpsmaxx>
 | CPU | 32 simulation distance is CPU-heavy; use `/fpsmaxx lowend` on weak PCs |
 | Sodium (optional, Fabric) | **0.9.2+ for 26.3** (recommended) |
 | Sodium (optional, NeoForge) | **0.9.3-beta.1+ for 26.3** (0.9.2 has a broken 26.3 mixin) |
-| Fabric jar | `FPSMaxx-1.5.0-fabric-mc26.3.jar` |
-| NeoForge jar | `FPSMaxx-1.5.0-neoforge-mc26.3.jar` |
+| Fabric jar | `FPSMaxx-1.5.5-fabric-mc26.3.jar` |
+| NeoForge jar | `FPSMaxx-1.5.5-neoforge-mc26.3.jar` |
 
 ## Low-end PC quick start
 
@@ -147,7 +167,7 @@ with `-Dfpsmaxx.forceLowEnd=true` or `-Dfpsmaxx.forceBalanced=true`.
 
 1. Install Fabric Loader 0.20.1+ for Minecraft 26.3.
 2. Put these two files in the instance's `mods` folder:
-   - `FPSMaxx-1.5.0-fabric-mc26.3.jar`
+   - `FPSMaxx-1.5.5-fabric-mc26.3.jar`
    - `fabric-api-0.165.0+26.3.jar`
 3. If you use **Sodium**, install **Sodium 0.9.2+ for 26.3** as well. FPSMaxx
    detects it automatically, applies the same adaptive radius to Sodium's
@@ -168,7 +188,7 @@ with `-Dfpsmaxx.forceLowEnd=true` or `-Dfpsmaxx.forceBalanced=true`.
 ## Install — NeoForge (PC)
 
 1. Install **NeoForge 26.3.0.97+** for Minecraft 26.3.
-2. Put `FPSMaxx-1.5.0-neoforge-mc26.3.jar` in the instance's `mods` folder.
+2. Put `FPSMaxx-1.5.5-neoforge-mc26.3.jar` in the instance's `mods` folder.
    You do **not** need Fabric API on NeoForge.
 3. If you use **Sodium**, install **Sodium NeoForge 0.9.3-beta.1+ for 26.3**.
    Sodium NeoForge 0.9.2 has a broken `LevelExtractor` mixin on 26.3 and will
@@ -184,7 +204,7 @@ Use the **Fabric** jar; most mobile launchers do not support NeoForge yet.
    Java 8/17/21. If the launcher does not offer Java 25 yet, the game itself
    cannot run 26.3 on that device — this is not a mod issue.
 2. Install **Fabric Loader 0.20.1+** for **26.3** inside the launcher.
-3. Copy `FPSMaxx-1.5.0-fabric-mc26.3.jar` **and**
+3. Copy `FPSMaxx-1.5.5-fabric-mc26.3.jar` **and**
    `fabric-api-0.165.0+26.3.jar` into `.minecraft/mods`. If your launcher/GPU
    supports Sodium 0.9.2+ for 26.3, install it too; FPSMaxx will detect it.
 4. Allocate as much RAM as the device allows. 64 chunks is extremely heavy;
@@ -206,6 +226,8 @@ Edit `config/fpsmaxx.json` (created after the first launch) or use commands:
   "minVisibleDistance": 4,
   "simulationDistance": 8,
   "forceSimulationDistance": true,
+  "adaptiveSimulation": true,
+  "minSimulationDistance": 5,
   "adaptiveMode": "auto",
   "sodiumIntegration": true,
   "sodiumConfigOverlay": true,
@@ -231,7 +253,7 @@ budget.
 
 | Command | What it does |
 |---|---|
-| `/fpsmaxx` or `/fpsmaxx status` | Show adaptive state, visible/simulation distance, culls, particles, section budget, FPS |
+| `/fpsmaxx` or `/fpsmaxx status` | Show adaptive state, visible/simulation distance, culls, particles, section budget, GPU, frame-time stats, FPS and benchmark progress |
 | `/fpsmaxx preset` | Open the five-position FpsMaxx graphics-preset screen (works with any renderer) |
 | `/fpsmaxx lowend` | Apply the complete low-end PC profile (Fresh & Smooth safe when that pack is detected) |
 | `/fpsmaxx potato` | Apply the extreme low-end profile (render 8, simulation 5) |
@@ -240,10 +262,15 @@ budget.
 | `/fpsmaxx visual <true/false>` | Enable/disable the automatic Fresh & Smooth visual-safe profile |
 | `/fpsmaxx balanced` | Restore normal mod-side defaults (vanilla graphics unchanged) |
 | `/fpsmaxx adaptive <true/false>` | Turn the governor on/off |
-| `/fpsmaxx target <fps>` | Target FPS (30–1000; default **65**, **60** in low-end/potato mode) |
-| `/fpsmaxx render <chunks>` | Set the requested render distance (2–64) |
+| `/fpsmaxx target <fps>` | Target FPS (30-1000; default **65**, **60** in low-end/potato mode) |
+| `/fpsmaxx render <chunks>` | Set the requested render distance (2-64) |
 | `/fpsmaxx mode <auto/visible/render>` | Choose the adaptive strategy (default **auto**) |
-| `/fpsmaxx simulation <chunks>` | Pin simulation distance (5–32; default **32**, **8** low-end, **5** potato) |
+| `/fpsmaxx simulation <chunks>` | Pin simulation distance (5-32; default **32**, **8** low-end, **5** potato) |
+| `/fpsmaxx simulationadaptive <true/false>` | Let the low-end/potato profile lower simulation distance when FPS is low (default off in balanced) |
+| `/fpsmaxx minsimulation <chunks>` | Lowest adaptive simulation distance (5-32; default **5**) |
+| `/fpsmaxx benchmark [seconds]` | Measure average FPS, 1% low, frame times and distance ranges for 5-120 seconds (default **15**) |
+| `/fpsmaxx benchmark stop` | Finish the current benchmark early |
+| `/fpsmaxx hardware` | Show the detected GPU, tier, RAM, heap and CPU threads |
 | `/fpsmaxx min <chunks>` | Lowest visible distance (default **8**, **4** low-end, **2** potato) |
 | `/fpsmaxx entity <blocks>` | Entity cull distance, 0 = off (default **96**, **48** low-end, **24** potato) |
 | `/fpsmaxx blockentity <blocks>` | Block-entity cull distance, 0 = off (default **96**, **32** low-end, **16** potato) |
@@ -297,7 +324,18 @@ currently afford.
   frame. This smooths stutter without leaving chunks permanently unbuilt. The
   budget applies to the vanilla chunk renderer; Sodium schedules its own chunk
   builds.
-- **Hidden FpsMaxx preset** — the graphics-preset slider gains a fifth position
+- **Adaptive simulation distance** - in singleplayer, simulation distance is a
+  second, slower lever. If FPS stays below target for two 4-second checks, the
+  low-end/potato profile drops simulation distance by one chunk (two when the
+  frame rate is less than half the target). After a sustained surplus it climbs
+  back one chunk at a time, never above the requested value. It is off in
+  balanced mode because it changes mob AI and ticking.
+- **Measured, not guessed** - `/fpsmaxx benchmark [seconds]` records real frame
+  intervals, not the smoothed FPS counter. It reports average FPS, 1% low FPS,
+  worst frame, worst 1-second window, the percentage of frames over 33.3/50 ms,
+  and the visible-radius/simulation-distance ranges. Use it to compare presets
+  or check whether a new mod helped.
+- **Hidden FpsMaxx preset** - the graphics-preset slider gains a fifth position
   on the far left. It applies the governor, all three cull distances, the
   particle budget and the chunk-update budget together with the low-end graphics
   reductions, so one drag enables optimizations that vanilla presets cannot reach.
@@ -341,10 +379,12 @@ simulation distance and the minimum visible distance.
 - Fog is moved to that same radius, so the world edge is never visible.
 - Entities, block entities and particles past their cull distances are not
   submitted, and far particles are removed from the tick list.
-- Simulation distance is pinned to `simulationDistance` when a world is entered:
+- Simulation distance starts at `simulationDistance` when a world is entered:
   **32 on a normal PC**, **8 in low-end mode**, **5 in potato mode** (or the
-  memory-safe cap). It is **not** part of the visible-radius governor because
-  lowering it changes mob AI and ticking; that is a deliberate manual trade-off.
+  memory-safe cap). In the low-end and potato profiles it is also adaptive: the
+  governor lowers it after a sustained FPS deficit and raises it back after a
+  sustained surplus, within `minSimulationDistance` and the requested value.
+  Balanced mode keeps it fixed because changing it alters mob AI and ticking.
 - Each second the mod reads the smoothed FPS. Below target it drops the visible
   radius quickly and reduces the particle budget; above target (with a
   5-second cooldown) it grows both back. A section budget also halves while the
@@ -371,6 +411,37 @@ for: the requested distance is 64, the GPU only draws what it can afford.
 That measurement used a lower simulation distance. A CPU-limited machine with
 simulation 32 may settle lower; use `/fpsmaxx lowend` or
 `/fpsmaxx simulation 12` / `8` if the visible radius keeps dropping.
+
+Version 1.5.5 adds `/fpsmaxx benchmark`, so you can produce the same kind of
+numbers on your own hardware instead of relying on a single superflat example.
+It reports average FPS, 1% low FPS, frame-time spikes and the actual visible
+radius range the governor used.
+
+## Benchmark
+
+Use the benchmark when you want evidence instead of a feel:
+
+```text
+/fpsmaxx benchmark        # 15 seconds after a 3-second warm-up
+/fpsmaxx benchmark 30     # 5-120 seconds
+/fpsmaxx benchmark stop   # finish early
+```
+
+Keep playing normally while it runs; do not open the pause menu or alt-tab.
+The benchmark ignores frames while the window is inactive, then reports:
+
+- average FPS (from real frame intervals, not the smoothed counter)
+- 1% low FPS and the p99 frame time
+- worst frame and worst 1-second window
+- percentage of frames over 33.3 ms and 50 ms
+- visible-radius and simulation-distance ranges
+- the full hardware/loader/target context
+
+The chat summary is short; the complete report is written to
+`config/fpsmaxx-benchmark-YYYYMMDD-HHMMSS.txt`. Run the same route twice (once
+with a mod disabled, once enabled) for a useful comparison. A single run in a
+new world is dominated by chunk generation; wait until the world has settled
+before starting.
 
 ## Settings for the "65 FPS" goal on PC
 
@@ -471,6 +542,19 @@ overload a weak CPU, so use `/fpsmaxx lowend` or `/fpsmaxx simulation` if needed
 `-Dfpsmaxx.ignoreMemoryLimit=true` to the JVM arguments to force 64 render and
 32 simulation.
 
+## Hardware detection
+
+On a fresh install only, FPSMaxx reads the renderer name/type, CPU threads,
+physical RAM and JVM heap after the window opens. It applies the **mod-side**
+low-end defaults for integrated/virtual GPUs or weak CPU/RAM, and the potato
+defaults for software renderers and very weak Android devices. It never changes
+vanilla graphics, and it never touches an existing `config/fpsmaxx.json`.
+
+`/fpsmaxx hardware` shows what was detected. Set `"autoDetectHardware": false`
+in the config before the first launch, or run `/fpsmaxx balanced`, to keep the
+normal defaults. Detection is advisory: `/fpsmaxx lowend`, `/fpsmaxx potato`
+and `/fpsmaxx balanced` always override it.
+
 ## Why singleplayer needs server-side mixins
 
 Minecraft's integrated server clamps its view distance to 32 chunks and its
@@ -479,7 +563,8 @@ client side, so 64 chunks can actually be generated and sent in singleplayer.
 Simulation distance already maxes out at 32 in vanilla; FPSMaxx raises the
 low-memory slider cap from 16 to 32 and applies the configured value when a
 world is entered. The integrated server reads the client option every tick, so
-`/fpsmaxx simulation` takes effect immediately.
+`/fpsmaxx simulation` and the adaptive simulation governor take effect
+immediately in singleplayer.
 
 On a real multiplayer server the server's own view distance and simulation
 distance still apply; the mod cannot force a server to send chunks or tick
@@ -495,8 +580,8 @@ entities it does not have.
 ./gradlew -p neoforge-probe build
 ```
 
-Fabric output: `build/libs/fpsmaxx-1.5.0.jar`  
-NeoForge output: `neoforge-probe/build/libs/fpsmaxx-neoforge-1.5.0.jar`
+Fabric output: `build/libs/fpsmaxx-1.5.5.jar`  
+NeoForge output: `neoforge-probe/build/libs/fpsmaxx-neoforge-1.5.5.jar`
 
 Toolchain: Gradle 9.7.1, Fabric Loom 1.18.4 / NeoForge ModDevGradle 2.0.148,
 Java 25, Minecraft 26.3 (unobfuscated, Mojang names).

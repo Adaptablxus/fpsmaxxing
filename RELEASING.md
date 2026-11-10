@@ -83,8 +83,9 @@ commit the Modrinth token or any API response scratch files.
 - `1.3.0` is archived at `dist/versions/FPSMaxx-1.3.0-mc26.2.jar`. It added the `/fpsmaxx potato` preset, chunk-update budgeting, removal of far particles, stronger low-end graphics reductions, and the `/fpsmaxx sectionbudget` command.
 - `1.4.0` is archived at `dist/versions/FPSMaxx-1.4.0-mc26.2.jar`. It added the hidden **FpsMaxx** graphics-preset position, automatic **Fresh & Smooth** visual-safe mode, AsyncParticles/Particle Core awareness, and Iris-safe fog handling.
 - `1.4.1` is archived at `dist/versions/FPSMaxx-1.4.1-mc26.2.jar`. It was the final Fabric 26.2 build and added the searchable **FPSMaxx** Sodium option page with an **Open FPSMaxx preset screen** button.
-- `1.5.0` is the current release. It adds Fabric and NeoForge builds for Minecraft 26.3 from a shared core, with Sodium integration on both loaders.
-- The old 1.1.0 label and the old 1.2.0 release are retired. The current `1.5.0` tag points to this source release.
+- `1.5.0` added Fabric and NeoForge builds for Minecraft 26.3 from a shared core, with Sodium integration on both loaders.
+- `1.5.5` is the current release. It adds adaptive simulation distance for the low-end/potato profiles, `/fpsmaxx benchmark` with 1% lows and frame-time spikes, GPU-aware first-run detection, richer status output, and the alt-tab governor fix.
+- The old 1.1.0 label and the old 1.2.0 release are retired. The current `1.5.5` tag points to this source release.
 
 ## Notes
 

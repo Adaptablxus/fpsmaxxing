@@ -18,6 +18,8 @@ import net.minecraft.util.Util;
 public final class FPSMaxxGovernor {
 	private static final long EVAL_INTERVAL_MS = 1000L;
 	private static final long RAMP_COOLDOWN_MS = 7000L;
+	private static final long SIM_EVAL_INTERVAL_MS = 4000L;
+	private static final long SIM_COOLDOWN_MS = 10000L;
 
 	private static int visibleDistance = -1;
 	private static int maxRenderDistance = -1;
@@ -29,6 +31,14 @@ public final class FPSMaxxGovernor {
 	private static String lastEffectiveMode;
 	private static float particleScale = 1.0F;
 
+	private static int simulationDistance = -1;
+	private static int requestedSimulationDistance = -1;
+	private static long lastSimEval;
+	private static long simCooldownUntil;
+	private static int simLowStreak;
+	private static int simHighStreak;
+	private static boolean applyingSimulation;
+
 	private FPSMaxxGovernor() {
 	}
 
@@ -37,6 +47,10 @@ public final class FPSMaxxGovernor {
 		if (level == null || client.player == null) {
 			visibleDistance = -1;
 			lastLevel = null;
+			simulationDistance = -1;
+			requestedSimulationDistance = -1;
+			simLowStreak = 0;
+			simHighStreak = 0;
 			return;
 		}
 
@@ -47,7 +61,12 @@ public final class FPSMaxxGovernor {
 
 		if (level != lastLevel) {
 			lastLevel = level;
-			applySimulationDistance(client, config);
+			requestedSimulationDistance = config.simulationDistance;
+			simulationDistance = applySimulationDistance(client, config);
+			lastSimEval = now;
+			simCooldownUntil = now + 6000L;
+			simLowStreak = 0;
+			simHighStreak = 0;
 
 			if (renderDistanceMode()) {
 				maxRenderDistance = Math.max(
@@ -167,12 +186,129 @@ public final class FPSMaxxGovernor {
 			visibleDistance = next;
 			invalidateSectionGraph();
 		}
+
+		tickSimulationDistance(client, config, now, target);
 	}
 
 	/**
-	 * Pins simulation distance to the configured value (32 by default) on world
-	 * join. Simulation distance is not a rendering distance, so it is not part
-	 * of the visible-radius governor: changing it changes mob AI and ticking.
+	 * Simulation distance is a separate, slower lever from the visible radius.
+	 * It changes mob AI and ticking, so it only moves after a sustained FPS
+	 * deficit/surplus and only in singleplayer, where the integrated server
+	 * reads the client option every tick.
+	 */
+	private static void tickSimulationDistance(Minecraft client, FPSMaxxConfig config, long now, int target) {
+		if (!config.adaptiveSimulation || !config.forceSimulationDistance || !client.hasSingleplayerServer()) {
+			return;
+		}
+		if (client.isPaused() || !client.isWindowActive()) {
+			return;
+		}
+
+		int max = Math.max(
+			FPSMaxxConstants.MIN_SIMULATION_DISTANCE,
+			Math.min(config.simulationDistance, FPSMaxxConstants.maxSafeSimulationDistance())
+		);
+		int min = Math.max(
+			FPSMaxxConstants.MIN_SIMULATION_DISTANCE,
+			Math.min(config.minSimulationDistance, max)
+		);
+
+		if (requestedSimulationDistance <= 0) {
+			requestedSimulationDistance = max;
+			simulationDistance = client.options.simulationDistance().get();
+			lastSimEval = now;
+			simCooldownUntil = now + 6000L;
+			return;
+		}
+
+		int current = client.options.simulationDistance().get();
+		if (!applyingSimulation && current != simulationDistance) {
+			if (current > max) {
+				// Another screen, mod or vanilla pause restore raised the option
+				// above the requested ceiling. Pin it back instead of silently
+				// accepting a much heavier simulation distance.
+				setSimulationDistance(client, max, "restore requested ceiling", target);
+				simLowStreak = 0;
+				simHighStreak = 0;
+				return;
+			}
+			// A manual reduction is respected as the current value, but the
+			// configured value stays the ceiling so the governor can climb back.
+			simulationDistance = current;
+			simLowStreak = 0;
+			simHighStreak = 0;
+			return;
+		}
+
+		if (now < simCooldownUntil || now - lastSimEval < SIM_EVAL_INTERVAL_MS) {
+			return;
+		}
+		lastSimEval = now;
+
+		int fps = client.getFps();
+		if (fps <= 0) {
+			return;
+		}
+
+		if (simulationDistance > max) {
+			setSimulationDistance(client, max, "clamp to requested ceiling", target);
+			simulationDistance = max;
+		}
+
+		if (fps < target - 8) {
+			simHighStreak = 0;
+			simLowStreak++;
+			if (simLowStreak >= 2 && simulationDistance > min) {
+				int step = fps < target / 2 ? 2 : 1;
+				int next = Math.max(min, simulationDistance - step);
+				setSimulationDistance(client, next, "FPS below target", target);
+				simCooldownUntil = now + SIM_COOLDOWN_MS;
+				simLowStreak = 0;
+			}
+		} else if (fps > target + 12) {
+			simLowStreak = 0;
+			simHighStreak++;
+			if (simHighStreak >= 3 && simulationDistance < max) {
+				int next = Math.min(max, simulationDistance + 1);
+				setSimulationDistance(client, next, "FPS above target", target);
+				simCooldownUntil = now + SIM_COOLDOWN_MS;
+				simHighStreak = 0;
+			}
+		} else {
+			simLowStreak = 0;
+			simHighStreak = 0;
+		}
+	}
+
+	private static void setSimulationDistance(Minecraft client, int distance, String reason, int target) {
+		int previous = client.options.simulationDistance().get();
+		if (previous == distance) {
+			simulationDistance = distance;
+			return;
+		}
+
+		applyingSimulation = true;
+		try {
+			client.options.simulationDistance().set(distance);
+			client.options.save();
+		} finally {
+			applyingSimulation = false;
+		}
+		simulationDistance = distance;
+		FPSMaxxBootstrap.LOGGER.info(
+			"Adaptive simulation distance {} -> {} chunks ({}; FPS {}, target {})",
+			previous,
+			distance,
+			reason,
+			client.getFps(),
+			target
+		);
+	}
+
+	/**
+	 * Pins simulation distance to the configured value on world join.
+	 * Simulation distance changes mob AI and ticking, so the adaptive governor
+	 * only moves it after a sustained FPS deficit/surplus.
 	 *
 	 * @return the distance that was applied (or the current distance when
 	 *         forcing is disabled)
@@ -190,6 +326,20 @@ public final class FPSMaxxGovernor {
 			FPSMaxxBootstrap.LOGGER.info("Simulation distance set to {} chunks", target);
 		}
 		return target;
+	}
+
+	/**
+	 * Re-reads the configured simulation distance and restarts the adaptive
+	 * simulation cooldown. Used by commands and presets so a manual change does
+	 * not get overwritten by a stale ceiling.
+	 */
+	public static void onSimulationConfigured(Minecraft client, FPSMaxxConfig config) {
+		requestedSimulationDistance = config.simulationDistance;
+		simulationDistance = applySimulationDistance(client, config);
+		lastSimEval = Util.getMillis();
+		simCooldownUntil = lastSimEval + 6000L;
+		simLowStreak = 0;
+		simHighStreak = 0;
 	}
 
 	private static int currentMaxVisible(Minecraft client) {
@@ -323,8 +473,29 @@ public final class FPSMaxxGovernor {
 	}
 
 	public static void onAdaptiveToggled() {
+		Minecraft client = Minecraft.getInstance();
+		FPSMaxxConfig config = FPSMaxxConfig.get();
+
 		if ("render".equals(lastEffectiveMode) && maxRenderDistance > 0) {
-			applyRenderDistance(Minecraft.getInstance(), maxRenderDistance);
+			applyRenderDistance(client, maxRenderDistance);
+		}
+
+		// If the adaptive simulation lever was switched off (or the whole
+		// governor was), put the requested simulation distance back.
+		if (client.level != null
+			&& client.hasSingleplayerServer()
+			&& config.forceSimulationDistance
+			&& (!config.adaptiveEnabled || !config.adaptiveSimulation)) {
+			int target = Math.min(config.simulationDistance, FPSMaxxConstants.maxSafeSimulationDistance());
+			target = Math.max(FPSMaxxConstants.MIN_SIMULATION_DISTANCE, target);
+			if (client.options.simulationDistance().get() != target) {
+				setSimulationDistance(
+					client,
+					target,
+					"adaptive simulation disabled",
+					effectiveTargetFps(client, config)
+				);
+			}
 		}
 
 		visibleDistance = -1;
@@ -336,6 +507,10 @@ public final class FPSMaxxGovernor {
 		settleUntil = 0L;
 		goodStreak = 0;
 		particleScale = 1.0F;
+		requestedSimulationDistance = -1;
+		simulationDistance = -1;
+		simLowStreak = 0;
+		simHighStreak = 0;
 		invalidateSectionGraph();
 	}
 
@@ -351,11 +526,18 @@ public final class FPSMaxxGovernor {
 		String targetText = target == config.targetFps
 			? target + " FPS"
 			: target + " FPS (FPS/VSync cap; requested " + config.targetFps + ")";
+		int sim = client.options.simulationDistance().get();
+		String simText = config.forceSimulationDistance
+			? "sim " + sim + "/" + config.simulationDistance + " chunks"
+				+ (config.adaptiveSimulation && client.hasSingleplayerServer() ? " adaptive" : " pinned")
+			: "sim " + sim + " chunks (manual)";
+		String benchmark = FPSMaxxMetrics.benchmarkStatus();
 		return "FPSMaxx: adaptive " + (config.adaptiveEnabled ? "ON" : "OFF")
 			+ " | mode " + mode
 			+ " | " + distanceText
-			+ " | sim " + client.options.simulationDistance().get() + " chunks"
+			+ " | " + simText
 			+ " | target " + targetText
-			+ " | current " + client.getFps() + " FPS";
+			+ " | current " + client.getFps() + " FPS"
+			+ (benchmark != null ? " | " + benchmark : "");
 	}
 }

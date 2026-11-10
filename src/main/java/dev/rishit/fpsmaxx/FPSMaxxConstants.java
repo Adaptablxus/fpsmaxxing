@@ -87,9 +87,17 @@ public final class FPSMaxxConstants {
 		if (Boolean.getBoolean("fpsmaxx.forceBalanced")) {
 			return false;
 		}
+		String os = System.getProperty("os.name", "").toLowerCase(java.util.Locale.ROOT);
+		String vendor = System.getProperty("java.vendor", "").toLowerCase(java.util.Locale.ROOT);
+		if (os.contains("android")
+			|| vendor.contains("android")
+			|| System.getenv("ANDROID_ROOT") != null
+			|| System.getenv("ANDROID_DATA") != null) {
+			return true;
+		}
 		int processors = Runtime.getRuntime().availableProcessors();
 		long heapMb = Runtime.getRuntime().maxMemory() / (1024L * 1024L);
-		return processors <= 4 || heapMb <= 2048L;
+		return processors <= 4 || heapMb <= 3072L;
 	}
 
 	/**

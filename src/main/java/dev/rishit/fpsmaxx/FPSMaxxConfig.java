@@ -22,6 +22,8 @@ public final class FPSMaxxConfig {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
 	private static FPSMaxxConfig instance;
+	private static boolean freshInstall;
+	private static boolean autoDetectHandled;
 
 	private static Path path() {
 		return FPSMaxxPlatform.configDir().resolve("fpsmaxx.json");
@@ -65,6 +67,22 @@ public final class FPSMaxxConfig {
 
 	/** Re-apply {@link #simulationDistance} whenever a world is entered. */
 	public boolean forceSimulationDistance = true;
+
+	/**
+	 * Let the governor lower simulation distance in singleplayer when FPS is
+	 * consistently below target. This changes mob AI and ticking, so it is off
+	 * by default and on only in the low-end and potato profiles.
+	 */
+	public boolean adaptiveSimulation = false;
+
+	/** Lowest simulation distance the adaptive governor may choose. */
+	public int minSimulationDistance = FPSMaxxConstants.MIN_SIMULATION_DISTANCE;
+
+	/** Apply a low-end or potato mod-side profile automatically on a fresh install. */
+	public boolean autoDetectHardware = true;
+
+	/** Last detected hardware tier; informational only. */
+	public String detectedHardware = "unknown";
 
 	/**
 	 * auto = use the visible-radius governor on vanilla/Sodium and fall back to
@@ -117,6 +135,9 @@ public final class FPSMaxxConfig {
 	public static synchronized void load() {
 		Path path = path();
 		boolean fresh = !Files.exists(path);
+		if (fresh) {
+			freshInstall = true;
+		}
 		if (!fresh) {
 			try {
 				String json = Files.readString(path, StandardCharsets.UTF_8);
@@ -142,6 +163,19 @@ public final class FPSMaxxConfig {
 		instance.save();
 	}
 
+	/**
+	 * True only for a config file that did not exist when this JVM loaded it.
+	 * Hardware detection runs once, after the render device is available, so it
+	 * can refine the first-run profile without touching existing installs.
+	 */
+	public static boolean shouldAutoDetectHardware() {
+		return freshInstall && !autoDetectHandled;
+	}
+
+	public static void markAutoDetectHandled() {
+		autoDetectHandled = true;
+	}
+
 	/** Mod-side defaults for a low-end machine. Vanilla graphics are applied by /fpsmaxx lowend. */
 	public void applyLowEndDefaults() {
 		lowEndMode = true;
@@ -151,6 +185,8 @@ public final class FPSMaxxConfig {
 		minVisibleDistance = FPSMaxxConstants.LOW_END_MIN_VISIBLE_DISTANCE;
 		simulationDistance = FPSMaxxConstants.LOW_END_SIMULATION_DISTANCE;
 		forceSimulationDistance = true;
+		adaptiveSimulation = true;
+		minSimulationDistance = FPSMaxxConstants.MIN_SIMULATION_DISTANCE;
 		adaptiveMode = "auto";
 		sodiumIntegration = true;
 		sodiumConfigOverlay = true;
@@ -172,6 +208,8 @@ public final class FPSMaxxConfig {
 		minVisibleDistance = FPSMaxxConstants.POTATO_MIN_VISIBLE_DISTANCE;
 		simulationDistance = FPSMaxxConstants.POTATO_SIMULATION_DISTANCE;
 		forceSimulationDistance = true;
+		adaptiveSimulation = true;
+		minSimulationDistance = FPSMaxxConstants.MIN_SIMULATION_DISTANCE;
 		adaptiveMode = "auto";
 		sodiumIntegration = true;
 		sodiumConfigOverlay = true;
@@ -197,6 +235,8 @@ public final class FPSMaxxConfig {
 		minVisibleDistance = FPSMaxxConstants.FRESH_SMOOTH_MIN_VISIBLE_DISTANCE;
 		simulationDistance = FPSMaxxConstants.FRESH_SMOOTH_SIMULATION_DISTANCE;
 		forceSimulationDistance = true;
+		adaptiveSimulation = false;
+		minSimulationDistance = FPSMaxxConstants.MIN_SIMULATION_DISTANCE;
 		adaptiveMode = "auto";
 		sodiumIntegration = true;
 		sodiumConfigOverlay = true;
@@ -221,6 +261,8 @@ public final class FPSMaxxConfig {
 		minVisibleDistance = FPSMaxxConstants.BALANCED_MIN_VISIBLE_DISTANCE;
 		simulationDistance = FPSMaxxConstants.MAX_SIMULATION_DISTANCE;
 		forceSimulationDistance = true;
+		adaptiveSimulation = false;
+		minSimulationDistance = FPSMaxxConstants.MIN_SIMULATION_DISTANCE;
 		adaptiveMode = "auto";
 		sodiumIntegration = true;
 		sodiumConfigOverlay = true;
@@ -242,6 +284,14 @@ public final class FPSMaxxConfig {
 			FPSMaxxConstants.MIN_SIMULATION_DISTANCE,
 			FPSMaxxConstants.MAX_SIMULATION_DISTANCE
 		);
+		minSimulationDistance = clamp(
+			minSimulationDistance,
+			FPSMaxxConstants.MIN_SIMULATION_DISTANCE,
+			simulationDistance
+		);
+		if (detectedHardware == null || detectedHardware.isBlank()) {
+			detectedHardware = "unknown";
+		}
 		if (adaptiveMode == null
 			|| (!adaptiveMode.equalsIgnoreCase("auto")
 				&& !adaptiveMode.equalsIgnoreCase("visible")

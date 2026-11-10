@@ -6,14 +6,18 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import dev.rishit.fpsmaxx.FPSMaxxConfig;
 import dev.rishit.fpsmaxx.FPSMaxxConstants;
 import dev.rishit.fpsmaxx.FPSMaxxGovernor;
+import dev.rishit.fpsmaxx.FPSMaxxMetrics;
 import dev.rishit.fpsmaxx.FPSMaxxPresetScreen;
 import dev.rishit.fpsmaxx.FPSMaxxPresets;
+import dev.rishit.fpsmaxx.FPSMaxxStatus;
 import dev.rishit.fpsmaxx.compat.FPSMaxxCompat;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+
+import java.util.List;
 
 /**
  * NeoForge client command tree. Mirrors the Fabric command set; the only
@@ -96,7 +100,7 @@ public final class FPSMaxxNeoForgeCommands {
 						config.forceSimulationDistance = true;
 						config.sanitize();
 						config.save();
-						FPSMaxxGovernor.applySimulationDistance(client, config);
+						FPSMaxxGovernor.onSimulationConfigured(client, config);
 						client.options.save();
 						int applied = client.options.simulationDistance().get();
 						feedback(ctx.getSource(), "FPSMaxx simulation distance requested: " + requested
@@ -104,6 +108,59 @@ public final class FPSMaxxNeoForgeCommands {
 							+ ", memory-safe max " + FPSMaxxConstants.maxSafeSimulationDistance() + ")");
 						return 1;
 					})))
+				.then(Commands.literal("simulationadaptive")
+					.then(Commands.argument("enabled", BoolArgumentType.bool()).executes(ctx -> {
+						Minecraft client = Minecraft.getInstance();
+						FPSMaxxConfig config = FPSMaxxConfig.get();
+						config.adaptiveSimulation = BoolArgumentType.getBool(ctx, "enabled");
+						config.save();
+						FPSMaxxGovernor.onSimulationConfigured(client, config);
+						feedback(ctx.getSource(), "FPSMaxx adaptive simulation "
+							+ (config.adaptiveSimulation ? "enabled" : "disabled")
+							+ " (floor " + config.minSimulationDistance
+							+ ", request " + config.simulationDistance + ")");
+						return 1;
+					})))
+				.then(Commands.literal("minsimulation")
+					.then(Commands.argument(
+						"chunks",
+						IntegerArgumentType.integer(
+							FPSMaxxConstants.MIN_SIMULATION_DISTANCE,
+							FPSMaxxConstants.MAX_SIMULATION_DISTANCE
+						)
+					).executes(ctx -> {
+						Minecraft client = Minecraft.getInstance();
+						FPSMaxxConfig config = FPSMaxxConfig.get();
+						config.minSimulationDistance = IntegerArgumentType.getInteger(ctx, "chunks");
+						config.sanitize();
+						config.save();
+						FPSMaxxGovernor.onSimulationConfigured(client, config);
+						feedback(ctx.getSource(), "FPSMaxx adaptive simulation floor set to "
+							+ config.minSimulationDistance + " chunks");
+						return 1;
+					})))
+				.then(Commands.literal("benchmark")
+					.executes(ctx -> {
+						FPSMaxxMetrics.startBenchmark(Minecraft.getInstance(), 15);
+						return 1;
+					})
+					.then(Commands.literal("stop").executes(ctx -> {
+						FPSMaxxMetrics.stopBenchmark(Minecraft.getInstance());
+						return 1;
+					}))
+					.then(Commands.argument("seconds", IntegerArgumentType.integer(5, 120)).executes(ctx -> {
+						FPSMaxxMetrics.startBenchmark(
+							Minecraft.getInstance(),
+							IntegerArgumentType.getInteger(ctx, "seconds")
+						);
+						return 1;
+					})))
+				.then(Commands.literal("hardware").executes(ctx -> {
+					for (String line : FPSMaxxStatus.hardwareLines(Minecraft.getInstance())) {
+						ctx.getSource().sendSystemMessage(Component.literal(line).withStyle(ChatFormatting.GRAY));
+					}
+					return 1;
+				}))
 				.then(Commands.literal("entity")
 					.then(Commands.argument("blocks", IntegerArgumentType.integer(0, 512)).executes(ctx -> {
 						FPSMaxxConfig config = FPSMaxxConfig.get();
@@ -183,7 +240,7 @@ public final class FPSMaxxNeoForgeCommands {
 				.then(Commands.literal("reload").executes(ctx -> {
 					FPSMaxxConfig.load();
 					FPSMaxxGovernor.onAdaptiveToggled();
-					FPSMaxxGovernor.applySimulationDistance(Minecraft.getInstance(), FPSMaxxConfig.get());
+					FPSMaxxGovernor.onSimulationConfigured(Minecraft.getInstance(), FPSMaxxConfig.get());
 					feedback(ctx.getSource(), "FPSMaxx config reloaded");
 					return 1;
 				}))
@@ -201,41 +258,13 @@ public final class FPSMaxxNeoForgeCommands {
 	}
 
 	private static void sendStatus(CommandSourceStack source) {
-		FPSMaxxConfig config = FPSMaxxConfig.get();
 		Minecraft client = Minecraft.getInstance();
-		feedback(source, FPSMaxxGovernor.statusLine(client));
-		String sodium = !FPSMaxxCompat.SODIUM
-			? "absent"
-			: "terrain " + (FPSMaxxCompat.sodiumTerrainHook() ? "hooked" : "no-hook")
-				+ ", fog " + (FPSMaxxCompat.sodiumFogHook() ? "hooked" : "no-hook")
-				+ ", config " + (FPSMaxxCompat.sodiumConfigHook() ? "hooked" : "no-hook");
-		source.sendSystemMessage(Component.literal(
-			"mode " + FPSMaxxGovernor.effectiveMode()
-				+ " | low-end " + (config.lowEndMode ? "on" : "off")
-				+ " | profile " + (FPSMaxxPresets.useFreshSmoothProfile()
-					? "Fresh & Smooth safe"
-					: config.lowEndMode ? "aggressive" : "balanced")
-				+ " | graphics " + (config.graphicsPresetFpsMaxx
-					? "FpsMaxx"
-					: client.options.graphicsPreset().get().getSerializedName())
-				+ " | max slider " + FPSMaxxConstants.MAX_RENDER_DISTANCE
-				+ " | min " + config.minVisibleDistance
-				+ " | sim " + config.simulationDistance
-				+ (config.forceSimulationDistance ? " (forced)" : " (manual)")
-				+ " | entity cull " + config.entityCullDistance
-				+ " | block entity cull " + config.blockEntityCullDistance
-				+ " | particles " + (FPSMaxxCompat.ASYNC_PARTICLES
-					? "AsyncParticles"
-					: config.particleCullDistance + " blocks / " + config.maxParticles + " cap"
-						+ (config.adaptiveParticles
-							? " (" + Math.round(FPSMaxxGovernor.particleScale() * 100.0F) + "%)"
-							: ""))
-				+ " | section budget " + config.sectionUpdateBudget
-				+ (config.sectionUpdateBudget > 0
-					? " (now " + FPSMaxxGovernor.sectionUpdateBudget() + ")"
-					: " (vanilla)")
-				+ " | sodium " + sodium
-		).withStyle(ChatFormatting.GRAY));
+		List<String> lines = FPSMaxxStatus.lines(client);
+		for (int i = 0; i < lines.size(); i++) {
+			source.sendSystemMessage(Component.literal(lines.get(i)).withStyle(
+				i == 0 ? ChatFormatting.GREEN : ChatFormatting.GRAY
+			));
+		}
 	}
 
 	private static void feedback(CommandSourceStack source, String message) {

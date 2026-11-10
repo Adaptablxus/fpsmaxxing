@@ -89,7 +89,7 @@ public final class FPSMaxxPresets {
 		config.save();
 
 		FPSMaxxGovernor.onAdaptiveToggled();
-		FPSMaxxGovernor.applySimulationDistance(client, config);
+		FPSMaxxGovernor.onSimulationConfigured(client, config);
 
 		if (screen != null) {
 			refresh(screen,
@@ -177,7 +177,7 @@ public final class FPSMaxxPresets {
 		config.save();
 
 		FPSMaxxGovernor.onAdaptiveToggled();
-		FPSMaxxGovernor.applySimulationDistance(client, config);
+		FPSMaxxGovernor.onSimulationConfigured(client, config);
 
 		if (screen != null) {
 			refresh(screen,
@@ -241,7 +241,7 @@ public final class FPSMaxxPresets {
 		config.save();
 
 		FPSMaxxGovernor.onAdaptiveToggled();
-		FPSMaxxGovernor.applySimulationDistance(client, config);
+		FPSMaxxGovernor.onSimulationConfigured(client, config);
 
 		return "FPSMaxx balanced preset: target " + config.targetFps
 			+ " FPS, simulation " + client.options.simulationDistance().get()
