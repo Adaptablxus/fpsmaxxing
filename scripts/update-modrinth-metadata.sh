@@ -4,7 +4,7 @@ set -euo pipefail
 : "${MODRINTH_TOKEN:?MODRINTH_TOKEN is required}"
 
 PROJECT_ID="kA3JYFQu"
-SUMMARY="Client-side Fabric and NeoForge optimization for Minecraft 26.3 with a hidden FpsMaxx graphics preset, 64-chunk render distance, adaptive FPS and simulation governors, a frame-time benchmark, GPU-aware first-run profiles, culling, chunk budgeting, Fresh & Smooth support, and Sodium/Iris integration."
+SUMMARY="Client-side Fabric and NeoForge optimization for Minecraft 26.3: hidden FpsMaxx preset, 64-chunk render, adaptive FPS/simulation governors, benchmark, GPU-aware profiles, culling, chunk budgeting, Fresh & Smooth and Sodium/Iris support."
 DATA_FILE="project-metadata.json"
 
 jq -n \
