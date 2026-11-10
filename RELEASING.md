@@ -47,8 +47,10 @@ The `Release` workflow runs for tags matching `v*`. It builds both loaders with
 Java 25, uploads `FPSMaxx-<version>-fabric-mc26.3.jar` and
 `FPSMaxx-<version>-neoforge-mc26.3.jar` to the GitHub release, and then publishes
 them to Modrinth when the `MODRINTH_TOKEN` Actions secret is configured. The
-upload script is `scripts/publish-modrinth.sh`; it skips cleanly if the secret is
-absent or the project is still under review.
+upload script is `scripts/publish-modrinth.sh`; it uploads even while the project
+is under review, because Modrinth queues versions and releases them with the
+project once it is approved. The workflow skips the upload cleanly if the secret
+is absent.
 
 ## Modrinth
 
@@ -59,7 +61,14 @@ Use `MODRINTH.md` as the project body and `modrinth-icon.png` as the icon. The
 release workflow uploads both jars automatically. To update the live project
 summary and body, run the **Update Modrinth metadata** workflow from the Actions
 tab; it uses `scripts/update-modrinth-metadata.sh` and the same `MODRINTH_TOKEN`
-secret. If uploading manually, create two versions:
+secret.
+
+To publish an existing GitHub release without rebuilding, run the **Publish to
+Modrinth** workflow from the Actions tab and enter the version (for example
+`1.5.5`). It downloads the release assets and runs the same script. The workflow
+also accepts a `modrinth-v<version>` tag.
+
+If uploading manually, create two versions:
 
 | Field | Fabric version | NeoForge version |
 |---|---|---|
@@ -72,8 +81,12 @@ secret. If uploading manually, create two versions:
 | Required dependency | Fabric API (`P7dR8mSH`) | none |
 | Optional dependency | Sodium (`AANobbMI`) | Sodium (`AANobbMI`) |
 
-The project is submitted for Modrinth review after the first version. Do not
-commit the Modrinth token or any API response scratch files.
+The project is submitted for Modrinth review after the first version. Modrinth
+currently takes two weeks to over a month to review new projects while it trains
+moderators. A project marked **Under review** is in the queue; do not re-submit
+or ask for status updates, because that does not speed it up. Versions uploaded
+during review stay queued and appear when the project is approved. Do not commit
+the Modrinth token or any API response scratch files.
 
 ## Archived versions
 
@@ -90,6 +103,8 @@ commit the Modrinth token or any API response scratch files.
 ## Notes
 
 - Do not commit `build/`, `run/`, `.gradle/`, or log files; they are ignored.
+- Keep the Modrinth project summary under 256 characters; the API rejects longer
+  descriptions. `scripts/update-modrinth-metadata.sh` currently uses 236.
 - The repository includes the current root jar and `dist/` jars so a clone has the
   same ready-to-install artifacts as the release.
 - Sodium is optional and is not bundled. The release jars have only FPSMaxx and
