@@ -1,0 +1,41 @@
+name: Publish to Modrinth
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (for example 1.5.5)"
+        required: true
+        default: "1.5.5"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download release jars
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          curl --fail --location --retry 3 \
+            --output "FPSMaxx-${VERSION}-fabric-mc26.3.jar" \
+            "https://github.com/Adaptablxus/fpsmaxxing/releases/download/v${VERSION}/FPSMaxx-${VERSION}-fabric-mc26.3.jar"
+          curl --fail --location --retry 3 \
+            --output "FPSMaxx-${VERSION}-neoforge-mc26.3.jar" \
+            "https://github.com/Adaptablxus/fpsmaxxing/releases/download/v${VERSION}/FPSMaxx-${VERSION}-neoforge-mc26.3.jar"
+
+      - name: Publish versions
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [ -z "${MODRINTH_TOKEN:-}" ]; then
+            echo "MODRINTH_TOKEN is not configured." >&2
+            exit 1
+          fi
+          bash scripts/publish-modrinth.sh

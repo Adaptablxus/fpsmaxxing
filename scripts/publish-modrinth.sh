@@ -15,15 +15,16 @@ for jar in "${FABRIC_JAR}" "${NEOFORGE_JAR}"; do
   fi
 done
 
-# The project is still under review. While that is true the public API returns
-# 404 even with a valid token, so skip cleanly instead of failing the release.
+# A project that is still under review returns 404 from the public project
+# endpoint even with a valid token, but version uploads are still accepted.
+# Attempt the upload so the version is queued and appears automatically once
+# the project is approved.
 PROJECT_STATUS=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
   "https://api.modrinth.com/v2/project/${PROJECT_ID}" \
   -H "Authorization: Bearer ${MODRINTH_TOKEN}" \
   -H "User-Agent: FPSMaxx-release-workflow")
 if [[ "${PROJECT_STATUS}" == "404" ]]; then
-  echo "Modrinth project ${PROJECT_ID} is not publicly available yet; skipping upload."
-  exit 0
+  echo "Modrinth project ${PROJECT_ID} is not public yet; uploading the version anyway."
 fi
 
 CHANGELOG="FPSMaxx ${VERSION} adds adaptive simulation distance, a real frame-time benchmark, GPU-aware first-run profiles, and the Fabric/NeoForge 26.3 builds.
