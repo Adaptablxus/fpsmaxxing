@@ -76,6 +76,16 @@ jobs:
           - **Performance preset** - \`/fpsmaxx performance\` disables the Fresh &
             Smooth visual-safe mode and applies the potato profile, adaptive
             culling and the 24-section budget in one command.
+          - **Dynamic render resolution** - below-target FPS renders the 3D world
+            at 50-100% of the window resolution and upscales it before the HUD is
+            drawn, so text and menus stay native. The governor steps down while
+            frames are short and back up when there is headroom. It disables
+            itself with Iris shader packs, VulkanMod and Nvidium.
+          - **Resolution controls** - \`/fpsmaxx dynamicresolution <true/false>\`
+            toggles the governor; \`/fpsmaxx resolution <50-100>\` sets the floor.
+          - **Governor timer fix** - the one-second evaluation gate could reset
+            itself every tick, which left the distance, culling and resolution
+            governors idle. Adaptive behavior now runs once per second.
           - **Integrated-GPU first run** - integrated graphics with 8 GB or less
             of RAM or a 4 GB-or-smaller heap now get the potato profile.
           - **Potato persistence** - potato and \`/fpsmaxx performance\` survive a

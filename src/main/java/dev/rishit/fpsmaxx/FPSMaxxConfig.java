@@ -135,6 +135,17 @@ public final class FPSMaxxConfig {
 	public boolean adaptiveCulling = false;
 
 	/**
+	 * Render the 3D world at a lower internal resolution when FPS is below
+	 * target, then upscale it before the GUI is drawn. The HUD stays native.
+	 * Disabled automatically when Iris shaders, VulkanMod or Nvidium own the
+	 * render pipeline.
+	 */
+	public boolean dynamicResolution = false;
+
+	/** Lowest dynamic resolution, as a percentage of the window size. */
+	public int dynamicResolutionMinPercent = 60;
+
+	/**
 	 * Maximum chunk-section mesh rebuilds scheduled in one frame. 0 = vanilla
 	 * (unlimited). A budget smooths the frame-time spikes caused by rebuilding
 	 * many sections at once; skipped sections are re-queued for the next frame.
@@ -161,11 +172,15 @@ public final class FPSMaxxConfig {
 				FPSMaxxConfig loaded = GSON.fromJson(object, FPSMaxxConfig.class);
 				if (loaded != null) {
 					instance = loaded;
-					// 1.5.6 adds adaptive culling. Configs that were already on a
-					// low-end profile keep that intent; balanced/custom configs
-					// are left exactly as they were.
+					// 1.5.6/1.5.7 add adaptive culling and dynamic resolution.
+					// Configs that were already on a low-end profile keep that
+					// intent; balanced/custom configs are left exactly as they
+					// were.
 					if (!object.has("adaptiveCulling") && loaded.lowEndMode) {
 						loaded.adaptiveCulling = true;
+					}
+					if (!object.has("dynamicResolution") && loaded.lowEndMode) {
+						loaded.dynamicResolution = true;
 					}
 				}
 			} catch (IOException | JsonSyntaxException | IllegalStateException e) {
@@ -221,6 +236,8 @@ public final class FPSMaxxConfig {
 		maxParticles = FPSMaxxConstants.LOW_END_MAX_PARTICLES;
 		adaptiveParticles = true;
 		adaptiveCulling = true;
+		dynamicResolution = true;
+		dynamicResolutionMinPercent = 60;
 		sectionUpdateBudget = FPSMaxxConstants.LOW_END_SECTION_UPDATE_BUDGET;
 	}
 
@@ -246,6 +263,8 @@ public final class FPSMaxxConfig {
 		maxParticles = FPSMaxxConstants.POTATO_MAX_PARTICLES;
 		adaptiveParticles = true;
 		adaptiveCulling = true;
+		dynamicResolution = true;
+		dynamicResolutionMinPercent = 50;
 		sectionUpdateBudget = FPSMaxxConstants.POTATO_SECTION_UPDATE_BUDGET;
 	}
 
@@ -277,6 +296,8 @@ public final class FPSMaxxConfig {
 		maxParticles = FPSMaxxConstants.FRESH_SMOOTH_MAX_PARTICLES;
 		adaptiveParticles = true;
 		adaptiveCulling = true;
+		dynamicResolution = false;
+		dynamicResolutionMinPercent = 75;
 		sectionUpdateBudget = FPSMaxxConstants.FRESH_SMOOTH_SECTION_UPDATE_BUDGET;
 	}
 
@@ -303,6 +324,8 @@ public final class FPSMaxxConfig {
 		maxParticles = FPSMaxxConstants.BALANCED_MAX_PARTICLES;
 		adaptiveParticles = true;
 		adaptiveCulling = false;
+		dynamicResolution = false;
+		dynamicResolutionMinPercent = 80;
 		sectionUpdateBudget = FPSMaxxConstants.BALANCED_SECTION_UPDATE_BUDGET;
 	}
 
@@ -335,6 +358,7 @@ public final class FPSMaxxConfig {
 		blockEntityCullDistance = clamp(blockEntityCullDistance, 0, 512);
 		particleCullDistance = clamp(particleCullDistance, 0, 512);
 		maxParticles = maxParticles == 0 ? 0 : clamp(maxParticles, 100, 20000);
+		dynamicResolutionMinPercent = clamp(dynamicResolutionMinPercent, 50, 100);
 		sectionUpdateBudget = clamp(sectionUpdateBudget, 0, 512);
 	}
 

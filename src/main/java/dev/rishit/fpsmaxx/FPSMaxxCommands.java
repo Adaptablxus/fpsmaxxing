@@ -259,6 +259,34 @@ public final class FPSMaxxCommands {
 						).withStyle(ChatFormatting.GREEN));
 						return 1;
 					})))
+				.then(ClientCommands.literal("dynamicresolution")
+					.then(ClientCommands.argument("enabled", BoolArgumentType.bool()).executes(ctx -> {
+						FPSMaxxConfig config = FPSMaxxConfig.get();
+						config.dynamicResolution = BoolArgumentType.getBool(ctx, "enabled");
+						config.save();
+						FPSMaxxGovernor.onResolutionToggled();
+						ctx.getSource().sendFeedback(Component.literal(
+							"FPSMaxx dynamic resolution " + (config.dynamicResolution ? "enabled" : "disabled")
+								+ (config.dynamicResolution && !FPSMaxxDynamicResolution.supported()
+									? " (unavailable with the current renderer/shader setup)"
+									: "")
+						).withStyle(ChatFormatting.GREEN));
+						return 1;
+					})))
+				.then(ClientCommands.literal("resolution")
+					.then(ClientCommands.argument("percent", IntegerArgumentType.integer(50, 100)).executes(ctx -> {
+						FPSMaxxConfig config = FPSMaxxConfig.get();
+						config.dynamicResolutionMinPercent = IntegerArgumentType.getInteger(ctx, "percent");
+						config.dynamicResolution = true;
+						config.sanitize();
+						config.save();
+						FPSMaxxGovernor.onResolutionToggled();
+						ctx.getSource().sendFeedback(Component.literal(
+							"FPSMaxx dynamic resolution floor set to "
+								+ config.dynamicResolutionMinPercent + "% and enabled"
+						).withStyle(ChatFormatting.GREEN));
+						return 1;
+					})))
 				.then(ClientCommands.literal("sectionbudget")
 					.then(ClientCommands.argument("sections", IntegerArgumentType.integer(0, 512)).executes(ctx -> {
 						FPSMaxxConfig config = FPSMaxxConfig.get();
@@ -279,6 +307,7 @@ public final class FPSMaxxCommands {
 				.then(ClientCommands.literal("reload").executes(ctx -> {
 					FPSMaxxConfig.load();
 					FPSMaxxGovernor.onAdaptiveToggled();
+					FPSMaxxGovernor.onResolutionToggled();
 					FPSMaxxGovernor.onSimulationConfigured(ctx.getSource().getClient(), FPSMaxxConfig.get());
 					ctx.getSource().sendFeedback(Component.literal("FPSMaxx config reloaded").withStyle(ChatFormatting.GREEN));
 					return 1;

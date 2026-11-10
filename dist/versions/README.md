@@ -10,6 +10,8 @@
 - `FPSMaxx-1.5.0-neoforge-mc26.3.jar` - archived 1.5.0 NeoForge 26.3 build.
 - `FPSMaxx-1.5.5-fabric-mc26.3.jar` - archived 1.5.5 Fabric 26.3 build (adaptive simulation, benchmark, GPU-aware first run).
 - `FPSMaxx-1.5.5-neoforge-mc26.3.jar` - archived 1.5.5 NeoForge 26.3 build.
+- `FPSMaxx-1.5.6-fabric-mc26.3.jar` - archived 1.5.6 Fabric 26.3 build (adaptive culling, performance preset, potato first run).
+- `FPSMaxx-1.5.6-neoforge-mc26.3.jar` - archived 1.5.6 NeoForge 26.3 build.
 - `fabric-api-0.161.0+26.2.jar` - legacy Fabric API required by the 26.2 builds above.
 
 The current Fabric and NeoForge 26.3 builds are in `dist/mods/`.

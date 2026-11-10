@@ -11,7 +11,23 @@ graphics settings and bursty chunk-mesh rebuilds. It also adds a hidden
 plus a visual-safe profile for the **Fresh & Smooth** modpack. Install it on
 the client, not on the server.
 
-### What's new in 1.5.6
+### What's new in 1.5.7
+
+- **Dynamic render resolution** - when FPS stays below target, the 3D world is
+  rendered at 50-100% of the window resolution and upscaled before the HUD is
+  drawn. Text, chat and menus stay at native resolution. The governor steps the
+  resolution down while frames are short and back up when there is headroom.
+- **`/fpsmaxx dynamicresolution <true/false>`** - turn the resolution governor
+  on or off.
+- **`/fpsmaxx resolution <percent>`** - set the lowest resolution (50-100%) and
+  enable the governor.
+- **Renderer safety guard** - dynamic resolution turns itself off when an Iris
+  shader pack, VulkanMod or Nvidium owns the render pipeline.
+- **Governor timer fix** - the one-second evaluation gate could reset itself
+  every tick, which left the distance, culling and resolution governors idle.
+  Adaptive behavior now runs once per second as intended.
+
+### Also in 1.5.6
 
 - **Adaptive entity and block-entity culling** - when FPS stays below target,
   the governor shrinks entity and block-entity cull distances by up to 50% and
@@ -20,7 +36,7 @@ the client, not on the server.
 - **`/fpsmaxx performance`** - one command that disables the Fresh & Smooth
   visual-safe mode and applies the potato profile, including adaptive culling,
   a 24-section update budget and a 60 FPS target.
-- **`/fpsmaxx adaptiveculling <true/false>`** - turn the new cull governor on or
+- **`/fpsmaxx adaptiveculling <true/false>`** - turn the cull governor on or
   off without changing the other profiles.
 - **Integrated-GPU first run** - integrated graphics with 8 GB or less of RAM,
   a 4 GB-or-smaller heap, or four CPU threads now start with the potato profile
@@ -37,8 +53,8 @@ first-run detection, richer status output and the alt-tab frame fix.
 
 | Loader | Minecraft | Jar |
 |---|---|---|
-| Fabric | 26.3 | `FPSMaxx-1.5.6-fabric-mc26.3.jar` |
-| NeoForge | 26.3 | `FPSMaxx-1.5.6-neoforge-mc26.3.jar` |
+| Fabric | 26.3 | `FPSMaxx-1.5.7-fabric-mc26.3.jar` |
+| NeoForge | 26.3 | `FPSMaxx-1.5.7-neoforge-mc26.3.jar` |
 | Fabric | 26.2 | `FPSMaxx-1.4.1-mc26.2.jar` (previous release) |
 
 Fabric users also need **Fabric API 0.165.0+26.3**. NeoForge users need
@@ -63,7 +79,7 @@ uses a real-render-distance fallback. See
 
 ### Hidden FpsMaxx graphics preset
 
-Open **Options → Video Settings** and drag the **Graphics Preset** slider all
+Open **Options â†’ Video Settings** and drag the **Graphics Preset** slider all
 the way to the left. The label changes to **FpsMaxx** and applies the hidden
 profile: the adaptive governor, entity/block-entity/particle culling and the
 chunk-update budget, together with the low-end graphics reductions. The normal
@@ -82,7 +98,7 @@ the full low-end profile anyway.
 Latest release: <https://github.com/Adaptablxus/fpsmaxxing/releases>  
 Modrinth: <https://modrinth.com/mod/fpsmaxx>
 
-> **Read this first — the honest part**
+> **Read this first â€” the honest part**
 >
 > No mod can render 64 chunks at 65+ FPS on every device. That is a hardware
 > limit, not a code limit. 64 chunks means roughly **16,600 loaded chunks** and
@@ -118,8 +134,8 @@ Modrinth: <https://modrinth.com/mod/fpsmaxx>
 | CPU | 32 simulation distance is CPU-heavy; use `/fpsmaxx lowend` on weak PCs |
 | Sodium (optional, Fabric) | **0.9.2+ for 26.3** (recommended) |
 | Sodium (optional, NeoForge) | **0.9.3-beta.1+ for 26.3** (0.9.2 has a broken 26.3 mixin) |
-| Fabric jar | `FPSMaxx-1.5.6-fabric-mc26.3.jar` |
-| NeoForge jar | `FPSMaxx-1.5.6-neoforge-mc26.3.jar` |
+| Fabric jar | `FPSMaxx-1.5.7-fabric-mc26.3.jar` |
+| NeoForge jar | `FPSMaxx-1.5.7-neoforge-mc26.3.jar` |
 
 ## Low-end PC quick start
 
@@ -168,18 +184,18 @@ with the low-end defaults. The command is what applies the vanilla graphics
 reductions. You can force the first-run choice with
 `-Dfpsmaxx.forceLowEnd=true` or `-Dfpsmaxx.forceBalanced=true`.
 
-## Install — Fabric (PC: official launcher / Prism / MultiMC)
+## Install â€” Fabric (PC: official launcher / Prism / MultiMC)
 
 1. Install Fabric Loader 0.20.1+ for Minecraft 26.3.
 2. Put these two files in the instance's `mods` folder:
-   - `FPSMaxx-1.5.6-fabric-mc26.3.jar`
+   - `FPSMaxx-1.5.7-fabric-mc26.3.jar`
    - `fabric-api-0.165.0+26.3.jar`
 3. If you use **Sodium**, install **Sodium 0.9.2+ for 26.3** as well. FPSMaxx
    detects it automatically, applies the same adaptive radius to Sodium's
    terrain and fog, and extends Sodium's render-distance slider to 64.
 4. Allocate **4 GB or more** to the instance for 64 chunks (6 GB recommended).
    A low-end PC with 2 GB can still play; it just loads fewer chunks.
-5. Launch the game, go to **Options → Video Settings**, and set **Render Distance**
+5. Launch the game, go to **Options â†’ Video Settings**, and set **Render Distance**
    to 64. The slider now goes past 32. On a low-end PC, leave it at 16 or lower
    and run `/fpsmaxx lowend` instead.
 6. Simulation distance is pinned when you enter a world: **32 on a normal PC**,
@@ -190,10 +206,10 @@ reductions. You can force the first-run choice with
    simulation distance and measured FPS.
 8. Press **F6** to toggle the adaptive governor on/off.
 
-## Install — NeoForge (PC)
+## Install â€” NeoForge (PC)
 
 1. Install **NeoForge 26.3.0.97+** for Minecraft 26.3.
-2. Put `FPSMaxx-1.5.6-neoforge-mc26.3.jar` in the instance's `mods` folder.
+2. Put `FPSMaxx-1.5.7-neoforge-mc26.3.jar` in the instance's `mods` folder.
    You do **not** need Fabric API on NeoForge.
 3. If you use **Sodium**, install **Sodium NeoForge 0.9.3-beta.1+ for 26.3**.
    Sodium NeoForge 0.9.2 has a broken `LevelExtractor` mixin on 26.3 and will
@@ -201,15 +217,15 @@ reductions. You can force the first-run choice with
 4. The in-game commands, keybind, presets and configuration are the same as the
    Fabric build. The config lives at `config/fpsmaxx.json`.
 
-## Install — PojavLauncher / MojoLauncher (Android)
+## Install â€” PojavLauncher / MojoLauncher (Android)
 
 Use the **Fabric** jar; most mobile launchers do not support NeoForge yet.
 
 1. Your launcher profile **must use Java 25**. Minecraft 26.3 will not start on
    Java 8/17/21. If the launcher does not offer Java 25 yet, the game itself
-   cannot run 26.3 on that device — this is not a mod issue.
+   cannot run 26.3 on that device â€” this is not a mod issue.
 2. Install **Fabric Loader 0.20.1+** for **26.3** inside the launcher.
-3. Copy `FPSMaxx-1.5.6-fabric-mc26.3.jar` **and**
+3. Copy `FPSMaxx-1.5.7-fabric-mc26.3.jar` **and**
    `fabric-api-0.165.0+26.3.jar` into `.minecraft/mods`. If your launcher/GPU
    supports Sodium 0.9.2+ for 26.3, install it too; FPSMaxx will detect it.
 4. Allocate as much RAM as the device allows. 64 chunks is extremely heavy;
@@ -282,6 +298,10 @@ budget.
 | `/fpsmaxx particles <blocks>` | Particle cull distance, 0 = off (default **64**, **24** low-end, **8** potato) |
 | `/fpsmaxx maxparticles <count>` | Particle cap, 0 = vanilla limits only (default **4000**, **1200** low-end, **400** potato) |
 | `/fpsmaxx sectionbudget <sections>` | Max chunk-section rebuilds per frame, 0 = vanilla (low-end **64**, potato **24**) |
+| `/fpsmaxx performance` | Disable the Fresh & Smooth safe mode and apply the full potato profile in one command |
+| `/fpsmaxx adaptiveculling <true/false>` | Enable/disable adaptive entity and block-entity culling |
+| `/fpsmaxx dynamicresolution <true/false>` | Enable/disable dynamic world resolution (auto-disabled with Iris shaders, VulkanMod or Nvidium) |
+| `/fpsmaxx resolution <percent>` | Lowest dynamic resolution, 50-100%, and enable the governor |
 | `/fpsmaxx reload` | Reload `config/fpsmaxx.json` and re-apply simulation distance |
 
 `/fpsmaxx simulation <chunks>` also sets `forceSimulationDistance` to `true`, so
@@ -291,11 +311,11 @@ control simulation distance instead, set `"forceSimulationDistance": false` in
 
 `adaptiveMode` controls how the governor reduces work:
 
-- `auto` — visible-radius mode on vanilla and Sodium; render-distance fallback
+- `auto` â€” visible-radius mode on vanilla and Sodium; render-distance fallback
   on VulkanMod (and when Sodium integration is disabled).
-- `visible` — chunks stay loaded; only the rendered radius changes. This is the
+- `visible` â€” chunks stay loaded; only the rendered radius changes. This is the
   smoothest mode and the one used by default on vanilla/Sodium.
-- `render` — changes the real render distance. Works with any renderer, but
+- `render` â€” changes the real render distance. Works with any renderer, but
   chunks load/unload as it moves, so expect some stutter. Useful as a fallback.
 
 ## How FPSMaxx optimizes
@@ -305,25 +325,25 @@ server/AI optimizer. Its main win is refusing to submit chunk sections,
 entities, block entities and particles that are outside the radius the GPU can
 currently afford.
 
-- **Adaptive chunk-section culling** — the largest saving. The client still
+- **Adaptive chunk-section culling** â€” the largest saving. The client still
   loads chunks at the selected distance, but `SectionOcclusionGraph` only feeds
   sections inside the current visible radius to the renderer. Fewer visible
   sections means fewer terrain draw calls, less GPU work and less chunk-mesh
   submission work. Because chunks stay loaded, shrinking the radius does not
   cause chunk-loading stutter.
-- **Sodium integration** — Sodium does not use vanilla's occlusion graph, so
+- **Sodium integration** â€” Sodium does not use vanilla's occlusion graph, so
   FPSMaxx caps Sodium's terrain search distance and fog parameters directly.
   This gives Sodium the same adaptive radius without unloading chunks.
-- **Entity and block-entity culling** — entities and block entities beyond the
+- **Entity and block-entity culling** â€” entities and block entities beyond the
   configured cull distance are skipped before extraction/submission. This matters
   at 64 chunks because the server keeps far more entities loaded.
-- **Particle culling and budgeting** — particles beyond the cull distance are
+- **Particle culling and budgeting** â€” particles beyond the cull distance are
   rejected before they enter the tick/render queues, and particles that drift
   outside the radius are removed instead of ticking forever. A live-particle cap
   stops rain, fires, explosions and large farms from flooding the client. When
   FPS drops, the governor reduces the particle budget down to 50% (75% on Fresh
   & Smooth); when FPS recovers, it grows back.
-- **Chunk-update budgeting** — chunk mesh rebuilds are bursty. When a large
+- **Chunk-update budgeting** â€” chunk mesh rebuilds are bursty. When a large
   batch of sections becomes dirty, FPSMaxx schedules only the nearest budget
   (64 in low-end mode, 24 in potato mode) and re-queues the rest for the next
   frame. This smooths stutter without leaving chunks permanently unbuilt. The
@@ -344,24 +364,24 @@ currently afford.
   on the far left. It applies the governor, all three cull distances, the
   particle budget and the chunk-update budget together with the low-end graphics
   reductions, so one drag enables optimizations that vanilla presets cannot reach.
-- **Fresh & Smooth safe profile** — the modpack is auto-detected. The FpsMaxx
+- **Fresh & Smooth safe profile** â€” the modpack is auto-detected. The FpsMaxx
   position keeps the pack's shaders, particles, animations and resource packs,
   while still reducing render/simulation distance, cull distances and chunk
   scheduling. `/fpsmaxx aggressive` forces the full low-end profile instead.
-- **Low-end preset** — one command applies Fast graphics, clouds off, cloud
+- **Low-end preset** â€” one command applies Fast graphics, clouds off, cloud
   distance 2, minimal particles, weather radius 3, no vignette, no improved
   transparency, zero chunk fade, no entity shadows or smooth lighting, no biome
   blend, mipmaps 0, minimum anisotropic filtering, entity distance scaling 0.5,
   render 16, simulation 8 and a 60 FPS cap. These are the settings that usually
   make the biggest difference on integrated graphics and old laptops.
-- **Potato preset** — the same reductions plus render 8, simulation 5, entity
+- **Potato preset** â€” the same reductions plus render 8, simulation 5, entity
   culling 24, block-entity culling 16, particle culling 8, particle cap 400 and
   a 24-section update budget for phones and very old integrated GPUs.
-- **Fog matching** — fog is moved to the same radius as the visible terrain. This
+- **Fog matching** â€” fog is moved to the same radius as the visible terrain. This
   is a visual fix (it hides the edge); it is not itself a large FPS gain.
-- **Memory guard** — on small heaps the mod caps loaded chunks and simulation
+- **Memory guard** â€” on small heaps the mod caps loaded chunks and simulation
   distance before they cause out-of-memory crashes or GC thrashing.
-- **Chunk retention** — the governor changes only the visible radius in
+- **Chunk retention** â€” the governor changes only the visible radius in
   `visible` mode, so moving around does not repeatedly load/unload chunks. The
   `render` fallback is for renderers without a visible-radius hook and does
   trade smoothness for compatibility.
@@ -407,7 +427,7 @@ simulation distance and the minimum visible distance.
 
 On the machine this was developed on (i3-12100, Intel UHD 730, 8 GB RAM,
 superflat test world), 64 chunks loaded and rendered. The governor settled
-around **40–46 visible chunks** while holding 65+ FPS, and dropped to ~24 during
+around **40â€“46 visible chunks** while holding 65+ FPS, and dropped to ~24 during
 the initial chunk-generation storm before climbing back. A normal world with
 terrain, mobs and block entities will settle lower. A high-end dedicated GPU
 will hold 64 much more comfortably. This is exactly what the adaptive mode is
@@ -482,7 +502,7 @@ before starting.
 
 These are the remaining high-impact levers, in order:
 
-1. `/fpsmaxx potato` — render 8, simulation 5, tiny cull distances.
+1. `/fpsmaxx potato` â€” render 8, simulation 5, tiny cull distances.
 2. Lower the **window resolution** or play in a smaller window. Fill rate is
    usually the biggest GPU cost on integrated graphics, and no mod can beat a
    lower pixel count.
@@ -585,8 +605,8 @@ entities it does not have.
 ./gradlew -p neoforge-probe build
 ```
 
-Fabric output: `build/libs/fpsmaxx-1.5.6.jar`  
-NeoForge output: `neoforge-probe/build/libs/fpsmaxx-neoforge-1.5.6.jar`
+Fabric output: `build/libs/fpsmaxx-1.5.7.jar`  
+NeoForge output: `neoforge-probe/build/libs/fpsmaxx-neoforge-1.5.7.jar`
 
 Toolchain: Gradle 9.7.1, Fabric Loom 1.18.4 / NeoForge ModDevGradle 2.0.148,
 Java 25, Minecraft 26.3 (unobfuscated, Mojang names).

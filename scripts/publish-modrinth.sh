@@ -27,13 +27,16 @@ if [[ "${PROJECT_STATUS}" == "404" ]]; then
   echo "Modrinth project ${PROJECT_ID} is not public yet; uploading the version anyway."
 fi
 
-CHANGELOG="FPSMaxx ${VERSION} adds adaptive entity/block-entity culling, a one-command performance profile, and a more aggressive integrated-GPU first run.
+CHANGELOG="FPSMaxx ${VERSION} adds dynamic world resolution, adaptive entity/block-entity culling, a one-command performance profile, and a more aggressive integrated-GPU first run.
 
 How it optimizes:
 - Hidden FpsMaxx preset: drag the Graphics Preset slider all the way left. The FpsMaxx position applies the adaptive governor, all cull distances, the particle budget and the chunk-update budget together with the low-end graphics reductions.
 - Low-end preset: /fpsmaxx lowend applies Fast graphics, clouds off, cloud distance 2, minimal particles, render 16, simulation 8 and a 60 FPS target.
 - Potato preset: /fpsmaxx potato goes to render 8, simulation 5, tiny cull distances and a 24-section update budget.
 - Performance preset: /fpsmaxx performance disables the Fresh & Smooth visual-safe mode and applies the potato profile, adaptive culling and the 24-section budget in one command.
+- Dynamic render resolution: below-target FPS renders the 3D world at 50-100% of the window resolution and upscales it before the HUD is drawn. Text and menus stay native. The governor steps down while frames are short and back up when there is headroom. It disables itself with Iris shader packs, VulkanMod and Nvidium.
+- Resolution controls: /fpsmaxx dynamicresolution <true/false> toggles the governor; /fpsmaxx resolution <50-100> sets the floor.
+- Governor timer fix: the one-second evaluation gate could reset itself every tick, leaving the distance, culling and resolution governors idle. Adaptive behavior now runs once per second as intended.
 - Adaptive chunk-section culling: chunks stay loaded, but only the affordable visible radius is submitted to the renderer.
 - Adaptive entity and block-entity culling: below-target FPS shrinks entity and block-entity cull distances by up to 50% and restores them when the frame rate recovers. Configured values remain the ceiling.
 - Adaptive simulation distance: in singleplayer, the low-end and potato profiles lower simulation distance after a sustained FPS deficit and raise it back when there is headroom. Balanced mode keeps it fixed.

@@ -9,14 +9,28 @@ integration.
 
 It is not a cheat and does not need to be installed on the server.
 
-## What's new in 1.5.6
+## What's new in 1.5.7
+
+- **Dynamic render resolution** - below-target FPS renders the 3D world at
+  50-100% of the window resolution and upscales it before the HUD is drawn.
+  Text, chat and menus stay sharp. The governor steps down while frames are
+  short and back up when there is headroom.
+- **`/fpsmaxx dynamicresolution <true/false>`** - toggle the resolution governor.
+- **`/fpsmaxx resolution <percent>`** - set the 50-100% floor and enable it.
+- **Renderer safety guard** - automatically disabled with Iris shader packs,
+  VulkanMod and Nvidium.
+- **Governor timer fix** - the evaluation gate reset its own timer every tick,
+  leaving the distance, culling and resolution governors idle. Adaptive
+  behavior now runs once per second as intended.
+
+## Also in 1.5.6
 
 - **Adaptive entity and block-entity culling** - below-target FPS shrinks entity
   and block-entity cull distances by up to 50%; they recover when the frame rate
   does. The configured values remain the ceiling.
 - **`/fpsmaxx performance`** - disables the Fresh & Smooth visual-safe mode and
   applies the potato profile in one command.
-- **`/fpsmaxx adaptiveculling <true/false>`** - toggle the new cull governor.
+- **`/fpsmaxx adaptiveculling <true/false>`** - toggle the cull governor.
 - **Integrated-GPU first run** - integrated graphics with 8 GB or less of RAM, a
   4 GB-or-smaller heap, or four CPU threads now start with potato defaults.
 - **Potato persistence** - potato and `/fpsmaxx performance` survive a restart.
@@ -29,8 +43,8 @@ first-run detection, richer status output and the alt-tab frame fix.
 
 | Loader | Minecraft | Jar |
 |---|---|---|
-| Fabric | 26.3 | `FPSMaxx-1.5.6-fabric-mc26.3.jar` |
-| NeoForge | 26.3 | `FPSMaxx-1.5.6-neoforge-mc26.3.jar` |
+| Fabric | 26.3 | `FPSMaxx-1.5.7-fabric-mc26.3.jar` |
+| NeoForge | 26.3 | `FPSMaxx-1.5.7-neoforge-mc26.3.jar` |
 | Fabric | 26.2 | `FPSMaxx-1.4.1-mc26.2.jar` (previous release) |
 
 Fabric users also need **Fabric API 0.165.0+26.3**. NeoForge users need
@@ -160,12 +174,12 @@ Simulation distance 32 is CPU-heavy; `/fpsmaxx lowend` lowers it to 8 and
 `/fpsmaxx potato` to 5. The governor trades visible draw distance for frame rate
 while keeping the requested chunks loaded.
 
-## Install — Fabric
+## Install â€” Fabric
 
 1. Install **Fabric Loader 0.20.1+** for **Minecraft 26.3** with **Java 25**.
 2. Install **Fabric API 0.165.0+26.3**.
 3. Optional but recommended: install **Sodium 0.9.2+ for 26.3**.
-4. Put `FPSMaxx-1.5.6-fabric-mc26.3.jar` in your `mods` folder. Delete any older
+4. Put `FPSMaxx-1.5.7-fabric-mc26.3.jar` in your `mods` folder. Delete any older
    FPSMaxx jar first.
 5. Allocate **4 GB or more** of RAM for 64 chunks (6 GB recommended). A 2 GB
    low-end PC can still play with fewer chunks.
@@ -173,10 +187,10 @@ while keeping the requested chunks loaded.
    `/fpsmaxx potato`. Otherwise set **Render Distance** to 64; simulation
    distance is applied automatically.
 
-## Install — NeoForge
+## Install â€” NeoForge
 
 1. Install **NeoForge 26.3.0.97+** for **Minecraft 26.3** with **Java 25**.
-2. Put `FPSMaxx-1.5.6-neoforge-mc26.3.jar` in your `mods` folder. Fabric API is
+2. Put `FPSMaxx-1.5.7-neoforge-mc26.3.jar` in your `mods` folder. Fabric API is
    not needed on NeoForge.
 3. Optional but recommended: install **Sodium NeoForge 0.9.3-beta.1+ for 26.3**.
    Sodium NeoForge 0.9.2 has a broken `LevelExtractor` mixin on 26.3.
@@ -212,6 +226,8 @@ while keeping the requested chunks loaded.
 | `/fpsmaxx particles <0-512>` | Particle cull distance |
 | `/fpsmaxx maxparticles <0-20000>` | Live particle cap |
 | `/fpsmaxx sectionbudget <0-512>` | Max chunk-section rebuilds per frame (0 = vanilla) |
+| `/fpsmaxx dynamicresolution <true/false>` | Enable/disable dynamic world resolution |
+| `/fpsmaxx resolution <50-100>` | Set the lowest dynamic resolution and enable it |
 | `/fpsmaxx adaptive <true/false>` | Toggle the adaptive governor |
 | `/fpsmaxx reload` | Reload `config/fpsmaxx.json` |
 

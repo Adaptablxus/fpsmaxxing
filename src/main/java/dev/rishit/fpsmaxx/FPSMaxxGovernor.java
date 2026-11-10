@@ -33,6 +33,10 @@ public final class FPSMaxxGovernor {
 	private static volatile float cullScale = 1.0F;
 	private static int cullLowStreak;
 	private static int cullHighStreak;
+	private static float resolutionScale = 1.0F;
+	private static int resolutionLowStreak;
+	private static int resolutionHighStreak;
+	private static long resolutionCooldownUntil;
 
 	private static int simulationDistance = -1;
 	private static int requestedSimulationDistance = -1;
@@ -57,6 +61,7 @@ public final class FPSMaxxGovernor {
 			cullScale = 1.0F;
 			cullLowStreak = 0;
 			cullHighStreak = 0;
+			resetResolution();
 			return;
 		}
 
@@ -97,6 +102,7 @@ public final class FPSMaxxGovernor {
 			cullScale = 1.0F;
 			cullLowStreak = 0;
 			cullHighStreak = 0;
+			resetResolution();
 			invalidateSectionGraph();
 			return;
 		}
@@ -107,6 +113,7 @@ public final class FPSMaxxGovernor {
 			cullScale = 1.0F;
 			cullLowStreak = 0;
 			cullHighStreak = 0;
+			resetResolution();
 			return;
 		}
 
@@ -118,8 +125,14 @@ public final class FPSMaxxGovernor {
 			return;
 		}
 
-		if (now - lastEval < EVAL_INTERVAL_MS || now < settleUntil) {
-			lastEval = now;
+		// Wait for the settle window without moving lastEval: moving it here
+		// would restart the interval every tick and the governor would never
+		// evaluate.
+		if (now < settleUntil) {
+			return;
+		}
+
+		if (now - lastEval < EVAL_INTERVAL_MS) {
 			return;
 		}
 		lastEval = now;
@@ -156,6 +169,7 @@ public final class FPSMaxxGovernor {
 		}
 
 		tickAdaptiveCulling(config, fps, target);
+		tickDynamicResolution(config, fps, target, now);
 
 		if (fps < target - 5) {
 			// Drop fast when below target. Compiling newly visible chunk meshes
@@ -332,6 +346,56 @@ public final class FPSMaxxGovernor {
 		} else {
 			cullLowStreak = 0;
 			cullHighStreak = 0;
+		}
+	}
+
+	/**
+	 * Dynamic resolution is the GPU-side counterpart to the distance governor.
+	 * It steps the internal resolution down while the frame rate is short and
+	 * back up when there is headroom. The cooldown stops it from chasing a
+	 * single slow frame, and the floor keeps text readable.
+	 */
+	private static void tickDynamicResolution(FPSMaxxConfig config, int fps, int target, long now) {
+		if (!config.dynamicResolution || !FPSMaxxDynamicResolution.supported()) {
+			resetResolution();
+			return;
+		}
+
+		float floor = Math.max(0.5F, config.dynamicResolutionMinPercent / 100.0F);
+		if (now < resolutionCooldownUntil) {
+			return;
+		}
+
+		if (fps < target - 8) {
+			resolutionHighStreak = 0;
+			resolutionLowStreak++;
+			if (resolutionLowStreak >= 2 && resolutionScale > floor) {
+				// Drop faster when the frame rate is far below target; a 10%
+				// step is too slow to rescue a 20 FPS scene.
+				float step = fps < target / 2 ? 0.2F : 0.1F;
+				resolutionScale = Math.max(floor, resolutionScale - step);
+				resolutionLowStreak = 0;
+				resolutionCooldownUntil = now + 3000L;
+				FPSMaxxDynamicResolution.setScale(resolutionScale);
+				FPSMaxxBootstrap.LOGGER.debug(
+					"Dynamic resolution scale -> {} (FPS {}, target {})",
+					resolutionScale,
+					fps,
+					target
+				);
+			}
+		} else if (fps > target + 12) {
+			resolutionLowStreak = 0;
+			resolutionHighStreak++;
+			if (resolutionHighStreak >= 4 && resolutionScale < 1.0F) {
+				resolutionScale = Math.min(1.0F, resolutionScale + 0.05F);
+				resolutionHighStreak = 0;
+				resolutionCooldownUntil = now + 5000L;
+				FPSMaxxDynamicResolution.setScale(resolutionScale);
+			}
+		} else {
+			resolutionLowStreak = 0;
+			resolutionHighStreak = 0;
 		}
 	}
 
@@ -560,6 +624,18 @@ public final class FPSMaxxGovernor {
 		cullHighStreak = 0;
 	}
 
+	public static void onResolutionToggled() {
+		resetResolution();
+	}
+
+	private static void resetResolution() {
+		resolutionScale = 1.0F;
+		resolutionLowStreak = 0;
+		resolutionHighStreak = 0;
+		resolutionCooldownUntil = 0L;
+		FPSMaxxDynamicResolution.resetScale();
+	}
+
 	public static void onAdaptiveToggled() {
 		Minecraft client = Minecraft.getInstance();
 		FPSMaxxConfig config = FPSMaxxConfig.get();
@@ -597,6 +673,7 @@ public final class FPSMaxxGovernor {
 		cullScale = 1.0F;
 		cullLowStreak = 0;
 		cullHighStreak = 0;
+		resetResolution();
 		requestedSimulationDistance = -1;
 		simulationDistance = -1;
 		simLowStreak = 0;
@@ -627,6 +704,10 @@ public final class FPSMaxxGovernor {
 			+ " | " + distanceText
 			+ " | " + simText
 			+ " | target " + targetText
+			+ (config.dynamicResolution
+				? " | res " + Math.round(FPSMaxxDynamicResolution.scale() * 100.0F) + "%"
+					+ (FPSMaxxDynamicResolution.supported() ? "" : " (unavailable)")
+				: "")
 			+ (config.adaptiveCulling ? " | cull " + Math.round(cullScale * 100.0F) + "%" : "")
 			+ " | current " + client.getFps() + " FPS"
 			+ (benchmark != null ? " | " + benchmark : "");

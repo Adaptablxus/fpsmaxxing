@@ -65,7 +65,7 @@ secret.
 
 To publish an existing GitHub release without rebuilding, run the **Publish to
 Modrinth** workflow from the Actions tab and enter the version (for example
-`1.5.6`). It downloads the release assets and runs the same script. The workflow
+`1.5.7`). It downloads the release assets and runs the same script. The workflow
 also accepts a `modrinth-v<version>` tag.
 
 If uploading manually, create two versions:
@@ -98,8 +98,9 @@ the Modrinth token or any API response scratch files.
 - `1.4.1` is archived at `dist/versions/FPSMaxx-1.4.1-mc26.2.jar`. It was the final Fabric 26.2 build and added the searchable **FPSMaxx** Sodium option page with an **Open FPSMaxx preset screen** button.
 - `1.5.0` added Fabric and NeoForge builds for Minecraft 26.3 from a shared core, with Sodium integration on both loaders.
 - `1.5.5` added adaptive simulation distance for the low-end/potato profiles, `/fpsmaxx benchmark` with 1% lows and frame-time spikes, GPU-aware first-run detection, richer status output, and the alt-tab governor fix.
-- `1.5.6` is the current release. It adds adaptive entity/block-entity culling, `/fpsmaxx performance`, `/fpsmaxx adaptiveculling`, an integrated-GPU potato first run, and potato-profile persistence across restarts.
-- The old 1.1.0 label and the old 1.2.0 release are retired. The current `1.5.6` tag points to this source release.
+- `1.5.6` added adaptive entity/block-entity culling, `/fpsmaxx performance`, `/fpsmaxx adaptiveculling`, an integrated-GPU potato first run, and potato-profile persistence across restarts.
+- `1.5.7` is the current release. It adds dynamic world resolution with `/fpsmaxx dynamicresolution` and `/fpsmaxx resolution`, a native-resolution HUD, and a renderer safety guard for Iris shaders, VulkanMod and Nvidium.
+- The old 1.1.0 label and the old 1.2.0 release are retired. The current `1.5.7` tag points to this source release.
 
 ## Notes
 

@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import dev.rishit.fpsmaxx.FPSMaxxConfig;
 import dev.rishit.fpsmaxx.FPSMaxxConstants;
+import dev.rishit.fpsmaxx.FPSMaxxDynamicResolution;
 import dev.rishit.fpsmaxx.FPSMaxxGovernor;
 import dev.rishit.fpsmaxx.FPSMaxxMetrics;
 import dev.rishit.fpsmaxx.FPSMaxxPresetScreen;
@@ -238,6 +239,31 @@ public final class FPSMaxxNeoForgeCommands {
 							+ (config.adaptiveCulling ? "enabled" : "disabled"));
 						return 1;
 					})))
+				.then(Commands.literal("dynamicresolution")
+					.then(Commands.argument("enabled", BoolArgumentType.bool()).executes(ctx -> {
+						FPSMaxxConfig config = FPSMaxxConfig.get();
+						config.dynamicResolution = BoolArgumentType.getBool(ctx, "enabled");
+						config.save();
+						FPSMaxxGovernor.onResolutionToggled();
+						feedback(ctx.getSource(), "FPSMaxx dynamic resolution "
+							+ (config.dynamicResolution ? "enabled" : "disabled")
+							+ (config.dynamicResolution && !FPSMaxxDynamicResolution.supported()
+								? " (unavailable with the current renderer/shader setup)"
+								: ""));
+						return 1;
+					})))
+				.then(Commands.literal("resolution")
+					.then(Commands.argument("percent", IntegerArgumentType.integer(50, 100)).executes(ctx -> {
+						FPSMaxxConfig config = FPSMaxxConfig.get();
+						config.dynamicResolutionMinPercent = IntegerArgumentType.getInteger(ctx, "percent");
+						config.dynamicResolution = true;
+						config.sanitize();
+						config.save();
+						FPSMaxxGovernor.onResolutionToggled();
+						feedback(ctx.getSource(), "FPSMaxx dynamic resolution floor set to "
+							+ config.dynamicResolutionMinPercent + "% and enabled");
+						return 1;
+					})))
 				.then(Commands.literal("sectionbudget")
 					.then(Commands.argument("sections", IntegerArgumentType.integer(0, 512)).executes(ctx -> {
 						FPSMaxxConfig config = FPSMaxxConfig.get();
@@ -254,6 +280,7 @@ public final class FPSMaxxNeoForgeCommands {
 				.then(Commands.literal("reload").executes(ctx -> {
 					FPSMaxxConfig.load();
 					FPSMaxxGovernor.onAdaptiveToggled();
+					FPSMaxxGovernor.onResolutionToggled();
 					FPSMaxxGovernor.onSimulationConfigured(Minecraft.getInstance(), FPSMaxxConfig.get());
 					feedback(ctx.getSource(), "FPSMaxx config reloaded");
 					return 1;

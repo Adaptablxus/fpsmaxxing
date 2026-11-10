@@ -10,6 +10,7 @@
 		"ChunkTaskPriorityQueueMixin",
 		"DistanceManagerMixin",
 		"GameRendererMixin",
+		"GameRendererAccessor",
 		"IntegratedServerMixin",
 		"LevelExtractorMixin",
 		"MinecraftMixin",
@@ -18,7 +19,8 @@
 		"ParticleEngineMixin",
 		"ParticleGroupMixin",
 		"PlayerListMixin",
-		"SectionOcclusionGraphMixin"
+		"SectionOcclusionGraphMixin",
+		"SkyRendererAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 0

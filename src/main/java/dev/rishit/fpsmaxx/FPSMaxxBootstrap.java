@@ -68,6 +68,12 @@ public final class FPSMaxxBootstrap {
 			FPSMaxxConfig.get().adaptiveMode,
 			FPSMaxxGovernor.effectiveMode()
 		);
+		LOGGER.info(
+			"FPSMaxx dynamic resolution {}: floor {}%, supported {}",
+			FPSMaxxConfig.get().dynamicResolution ? "ON" : "OFF",
+			FPSMaxxConfig.get().dynamicResolutionMinPercent,
+			FPSMaxxDynamicResolution.supported()
+		);
 		if (FPSMaxxCompat.FRESH_AND_SMOOTH) {
 			LOGGER.info(
 				"FPSMaxx: Fresh & Smooth detected; visual-safe profile {} (shaders, particles and animations preserved)",

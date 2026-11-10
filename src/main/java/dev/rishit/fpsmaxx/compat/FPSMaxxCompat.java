@@ -53,6 +53,8 @@ public final class FPSMaxxCompat {
 	private static boolean sodiumConfigHook;
 	private static boolean sodiumCapLogged;
 	private static boolean sodiumErrorLogged;
+	private static long irisCheckAt;
+	private static boolean irisShaderPackActive;
 
 	private FPSMaxxCompat() {
 	}
@@ -99,6 +101,32 @@ public final class FPSMaxxCompat {
 
 	public static boolean sodiumConfigHook() {
 		return sodiumConfigHook;
+	}
+
+	/**
+	 * Iris shader packs own the whole world pipeline. Dynamic resolution swaps
+	 * the vanilla main target, which is not safe while a pack is active, so the
+	 * feature checks this before enabling itself. The result is cached briefly
+	 * because the check is called from the render loop.
+	 */
+	public static boolean irisShaderPackActive() {
+		if (!IRIS) {
+			return false;
+		}
+		long now = System.currentTimeMillis();
+		if (now - irisCheckAt < 5000L) {
+			return irisShaderPackActive;
+		}
+		irisCheckAt = now;
+		try {
+			Class<?> api = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+			Object instance = api.getMethod("getInstance").invoke(null);
+			Object result = api.getMethod("isShaderPackInUse").invoke(instance);
+			irisShaderPackActive = result instanceof Boolean value && value;
+		} catch (Throwable throwable) {
+			irisShaderPackActive = false;
+		}
+		return irisShaderPackActive;
 	}
 
 	public static void reportSodiumError(Throwable throwable) {

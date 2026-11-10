@@ -1,12 +1,15 @@
 package dev.rishit.fpsmaxx.mixin;
 
 import dev.rishit.fpsmaxx.FPSMaxxConfig;
+import dev.rishit.fpsmaxx.FPSMaxxDynamicResolution;
 import dev.rishit.fpsmaxx.FPSMaxxGovernor;
 import dev.rishit.fpsmaxx.compat.FPSMaxxCompat;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * Fog uses the visible radius instead of the loaded radius, so the edge of the
@@ -30,5 +33,15 @@ public abstract class GameRendererMixin {
 			return vanillaRenderDistance;
 		}
 		return FPSMaxxGovernor.fogDistanceChunks(vanillaRenderDistance);
+	}
+
+	@Inject(method = "renderLevel", at = @At("HEAD"))
+	private void fpsmaxx$beginDynamicResolution(CallbackInfo ci) {
+		FPSMaxxDynamicResolution.beginFrame((GameRenderer) (Object) this);
+	}
+
+	@Inject(method = "renderLevel", at = @At("RETURN"))
+	private void fpsmaxx$endDynamicResolution(CallbackInfo ci) {
+		FPSMaxxDynamicResolution.endFrame((GameRenderer) (Object) this);
 	}
 }

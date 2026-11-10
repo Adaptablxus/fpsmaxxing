@@ -62,6 +62,11 @@ public final class FPSMaxxStatus {
 			+ (config.sectionUpdateBudget > 0
 				? " (now " + FPSMaxxGovernor.sectionUpdateBudget() + ")"
 				: " (vanilla)")
+			+ " | resolution " + (config.dynamicResolution
+				? Math.round(FPSMaxxDynamicResolution.scale() * 100.0F) + "%"
+					+ " (min " + config.dynamicResolutionMinPercent + "%)"
+					+ (FPSMaxxDynamicResolution.supported() ? "" : " unavailable")
+				: "off")
 			+ (config.adaptiveCulling
 				? " | adaptive cull " + Math.round(FPSMaxxGovernor.cullScale() * 100.0F) + "%"
 				: ""));
