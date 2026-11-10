@@ -19,6 +19,7 @@ jq -n \
   --arg changelog "FPSMaxx ${VERSION} is a client-side Fabric optimization mod for Minecraft 26.2, built for smooth gameplay on low-end PCs.
 
 How it optimizes:
+- Governor timer fix: the one-second evaluation gate reset its own timer every tick, so the adaptive governor never evaluated and only static profile settings were applied. It now runs once per second as intended, so the visible radius and particle budget react to the real frame rate.
 - Hidden FpsMaxx preset: drag the Graphics Preset slider all the way left. The FpsMaxx position applies the adaptive governor, all cull distances, the particle budget and the chunk-update budget together with the low-end graphics reductions.
 - Low-end preset: /fpsmaxx lowend applies Fast graphics, clouds off, cloud distance 2, minimal particles, render 16, simulation 8 and a 60 FPS target.
 - Potato preset: /fpsmaxx potato goes to render 8, simulation 5, tiny cull distances and a 24-section update budget.

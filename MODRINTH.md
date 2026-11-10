@@ -7,6 +7,14 @@ budgeting, and entity, block-entity and particle culling.
 
 It is not a cheat and does not need to be installed on the server.
 
+## What's new in 1.4.2
+
+- **Governor timer fix** - the one-second evaluation gate reset its own timer
+  every tick, so the adaptive governor never evaluated and FPSMaxx only applied
+  static profile settings. It now runs once per second as intended, so the
+  visible radius and particle budget respond to the real frame rate.
+- **Drop-in update** - 1.4.2 keeps your existing config and graphics settings.
+
 ## Hidden FpsMaxx graphics preset
 
 Open **Options -> Video Settings** and drag the **Graphics Preset** slider all

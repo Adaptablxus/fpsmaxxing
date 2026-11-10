@@ -87,8 +87,14 @@ public final class FPSMaxxGovernor {
 			return;
 		}
 
-		if (now - lastEval < EVAL_INTERVAL_MS || now < settleUntil) {
-			lastEval = now;
+		// Wait for the settle window without moving lastEval: moving it here
+		// would restart the interval every tick and the governor would never
+		// evaluate.
+		if (now < settleUntil) {
+			return;
+		}
+
+		if (now - lastEval < EVAL_INTERVAL_MS) {
 			return;
 		}
 		lastEval = now;

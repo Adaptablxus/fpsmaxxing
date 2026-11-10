@@ -44,6 +44,11 @@ jobs:
 
           ### How it optimizes
 
+          - **Governor timer fix** - the one-second evaluation gate reset its own
+            timer every tick, so the adaptive governor never evaluated and only
+            static profile settings were applied. It now runs once per second as
+            intended, so the visible radius and particle budget react to the real
+            frame rate.
           - **Hidden FpsMaxx preset** - drag the Graphics Preset slider all the way
             left. The FpsMaxx position applies the adaptive governor, all cull
             distances, the particle budget and the chunk-update budget together

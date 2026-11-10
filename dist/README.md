@@ -43,6 +43,15 @@ the full low-end profile anyway.
 Latest release: <https://github.com/Adaptablxus/fpsmaxxing/releases>  
 Modrinth: <https://modrinth.com/mod/fpsmaxx>
 
+### What's new in 1.4.2
+
+- **Governor timer fix** - the one-second evaluation gate reset its own timer
+  every tick, so the adaptive governor never evaluated and FPSMaxx only applied
+  static profile settings. It now runs once per second as intended, so the
+  visible radius and particle budget respond to the real frame rate.
+- **No profile changes** - 1.4.2 is a drop-in replacement for 1.4.1. Your
+  existing `config/fpsmaxx.json` and graphics settings are untouched.
+
 > **Read this first — the honest part**
 >
 > No mod can render 64 chunks at 65+ FPS on every device. That is a hardware
