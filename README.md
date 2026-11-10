@@ -55,7 +55,7 @@ first-run detection, richer status output and the alt-tab frame fix.
 |---|---|---|
 | Fabric | 26.3 | `FPSMaxx-1.5.7-fabric-mc26.3.jar` |
 | NeoForge | 26.3 | `FPSMaxx-1.5.7-neoforge-mc26.3.jar` |
-| Fabric | 26.2 | `FPSMaxx-1.4.1-mc26.2.jar` (previous release) |
+| Fabric | 26.2 | `FPSMaxx-1.4.2-mc26.2.jar` (governor timer fix) |
 
 Fabric users also need **Fabric API 0.165.0+26.3**. NeoForge users need
 **NeoForge 26.3.0.97+**. Both builds require **Java 25**. The Fabric jar also
