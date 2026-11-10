@@ -2,6 +2,9 @@ name: Update Modrinth metadata
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - "modrinth-metadata-v*"
 
 permissions:
   contents: read

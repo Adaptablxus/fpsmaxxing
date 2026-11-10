@@ -12,7 +12,8 @@ jq -n \
   --rawfile body MODRINTH.md \
   '{
     description: $description,
-    body: $body
+    body: $body,
+    requested_status: "approved"
   }' > "${DATA_FILE}"
 
 curl --fail-with-body --retry 3 --retry-delay 2 \
